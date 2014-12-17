@@ -1,0 +1,10 @@
+Style/Documentation:
+  Enabled: false
+
+Style/FileName:
+  Exclude:
+    - lib/aaf-gumboot.rb
+
+AllCops:
+  Exclude:
+    - spec/dummy/**/*
