@@ -1,5 +1,5 @@
 RSpec.shared_examples 'Permissions' do
-  subject { create :permission }
+  subject { build :permission }
   it 'has a valid factory' do
     expect(subject).to be_valid
   end

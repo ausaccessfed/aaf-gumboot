@@ -1,5 +1,5 @@
 RSpec.shared_examples 'Roles' do
-  subject { create :role }
+  subject { build :role }
   it 'has a valid factory' do
     expect(subject).to be_valid
   end

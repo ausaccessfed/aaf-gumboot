@@ -1,5 +1,5 @@
 RSpec.shared_examples 'API Subjects' do
-  subject { create :api_subject }
+  subject { build :api_subject }
   it 'has a valid factory' do
     expect(subject).to be_valid
   end
