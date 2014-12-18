@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
                        ' same basic structure and implementation for' \
                        ' subjects, RESTful APIs and access control.'
   spec.homepage      = 'http://www.aaf.edu.au'
-  spec.license       = 'MIT'
+  spec.license       = 'Apache-2.0'
 
   spec.files         = `git ls-files -z`.split("\x0")
 
