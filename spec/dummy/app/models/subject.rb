@@ -11,7 +11,7 @@ class Subject < ActiveRecord::Base
   def permissions
     # This could be extended to gather permissions from
     # other data sources providing input to subject identity
-    subject_role_assignments.flat_map { |ra| ra.role.permissions.map(&:value) }
+    roles.flat_map { |role| role.permissions.map(&:value) }
   end
 
   def functioning?

@@ -94,28 +94,26 @@ end
 ```
 ##### Sequel
 ``` ruby
-module API
-  class Subject < Sequel::Model
-    include Accession::Principal
+class Subject < Sequel::Model
+  include Accession::Principal
 
-    many_to_many :roles, class: 'Role'
+  many_to_many :roles, class: 'Role'
 
-    def permissions
-      # This could be extended to gather permissions from
-      # other data sources providing input to api_subject identity
-      roles.flat_map { |role| role.permissions.map(&:value) }
-    end
+  def permissions
+    # This could be extended to gather permissions from
+    # other data sources providing input to api_subject identity
+    roles.flat_map { |role| role.permissions.map(&:value) }
+  end
 
-    def functioning?
-      # more then enabled could inform functioning?
-      # such as an administrative or AAF lock
-      enabled
-    end
+  def functioning?
+    # more then enabled could inform functioning?
+    # such as an administrative or AAF lock
+    enabled
+  end
 
-    def validate
-      validates_presence [:name, :mail, :enabled, :complete]
-      validates_presence [:targeted_id, :shared_token] if :complete?
-    end
+  def validate
+    validates_presence [:name, :mail, :enabled, :complete]
+    validates_presence [:targeted_id, :shared_token] if :complete?
   end
 end
 ```
@@ -128,7 +126,7 @@ require 'gumboot/shared_examples/subjects'
 
 RSpec.describe Subject, type: :model do
   include_examples 'Subjects'
-  
+
   # TODO: examples for your model extensions here
 end
 ```
