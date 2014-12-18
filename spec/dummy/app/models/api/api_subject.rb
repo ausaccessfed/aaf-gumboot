@@ -10,6 +10,7 @@ module API
     validates :x509_cn, presence: true
     validates :description, presence: true
     validates :mail, presence: true
+    validates :enabled, inclusion: [true, false]
 
     def permissions
       # This could be extended to gather permissions from
@@ -18,6 +19,8 @@ module API
     end
 
     def functioning?
+      # more then enabled could inform functioning?
+      # such as an administrative or AAF lock
       enabled
     end
   end
