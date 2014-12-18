@@ -2,7 +2,7 @@ FactoryGirl.define do
   factory :api_subject, class: API::APISubject do
     x509_cn { Faker::Lorem.word }
     description { Faker::Lorem.sentence }
-    email { Faker::Internet.email }
+    mail { Faker::Internet.email }
     enabled true
 
     trait :authorized do

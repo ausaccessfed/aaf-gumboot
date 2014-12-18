@@ -11,8 +11,8 @@ RSpec.shared_examples 'API Subjects' do
     subject.description = nil
     expect(subject).not_to be_valid
   end
-  it 'is invalid without a contact email' do
-    subject.email = nil
+  it 'is invalid without a contact mail address' do
+    subject.mail = nil
     expect(subject).not_to be_valid
   end
   it 'has a relationship to roles' do

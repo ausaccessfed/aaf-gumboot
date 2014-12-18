@@ -9,7 +9,7 @@ module API
 
     validates :x509_cn, presence: true
     validates :description, presence: true
-    validates :email, presence: true
+    validates :mail, presence: true
 
     def permissions
       # This could be extended to gather permissions from

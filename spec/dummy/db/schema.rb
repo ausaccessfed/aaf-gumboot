@@ -13,7 +13,7 @@ ActiveRecord::Schema.define(version: 0) do
   create_table :api_subjects do |t|
     t.string :x509_cn
     t.string :description
-    t.string :email
+    t.string :mail
     t.boolean :enabled
     t.timestamps
   end
