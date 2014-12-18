@@ -1,6 +1,6 @@
-RSpec.shared_examples 'API Subjects' do
+RSpec.shared_examples 'Subjects' do
   context 'AAF shared implementation' do
-    subject { build :api_subject }
+    subject { build :subject }
 
     it { is_expected.to be_valid }
     it { is_expected.to be_an(Accession::Principal) }
@@ -9,20 +9,20 @@ RSpec.shared_examples 'API Subjects' do
     it { is_expected.to respond_to(:permits?) }
     it { is_expected.to respond_to(:functioning?) }
 
-    it 'is invalid without an x509_cn' do
-      subject.x509_cn = nil
+    it 'is invalid without a name' do
+      subject.name = nil
       expect(subject).not_to be_valid
     end
-    it 'is invalid without a description' do
-      subject.description = nil
-      expect(subject).not_to be_valid
-    end
-    it 'is invalid without a contact mail address' do
+    it 'is invalid without mail' do
       subject.mail = nil
       expect(subject).not_to be_valid
     end
     it 'is invalid without an enabled state' do
       subject.enabled = nil
+      expect(subject).not_to be_valid
+    end
+    it 'is invalid without a complete state' do
+      subject.complete = nil
       expect(subject).not_to be_valid
     end
   end

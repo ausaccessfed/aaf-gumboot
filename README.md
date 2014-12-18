@@ -45,7 +45,6 @@ And then execute:
     $ bundle
 
 ## Acronyms
-
 Before getting started it is **strongly recommended** that you ensure 'API' is an acronym within your application
 
 e.g for Rails applications in config/initializers/inflections.rb
@@ -66,12 +65,74 @@ For each model a FactoryGirl factory *must also be provided*.
 For each model the provided RSpec shared examples **must** be used within your application and **must** pass.
 
 #### Subject
-A Subject is a security-specific 'view' of an application user. A Subject does not always need to reflect a human being. It is a representation of any entity that is doing something with the application.
+A Subject represents state and security operations for a single application user.
 
-TODO.
+##### Active Model
+```ruby
+class Subject < ActiveRecord::Base
+  include Accession::Principal
 
-#### APISubject
-An API Subject is a logical extension of the Subject concept reserved specifically for representations entities that utilise x509 client certificate verification for making requests to our applications RESTful API endpoints.
+  has_many :subject_roles
+  has_many :roles, through: :subject_roles
+
+  validates :name, :mail, presence: true
+  validates :targeted_id, :shared_token, presence: true, if: :complete?
+  validates :enabled, :complete, inclusion: [true, false]
+
+  def permissions
+    # This could be extended to gather permissions from
+    # other data sources providing input to subject identity
+    roles.flat_map { |role| role.permissions.map(&:value) }
+  end
+
+  def functioning?
+    # more then enabled could inform functioning?
+    # such as an administrative or AAF lock
+    enabled
+  end
+end
+```
+##### Sequel
+``` ruby
+class Subject < Sequel::Model
+  include Accession::Principal
+
+  many_to_many :roles, class: 'Role'
+
+  def permissions
+    # This could be extended to gather permissions from
+    # other data sources providing input to api_subject identity
+    roles.flat_map { |role| role.permissions.map(&:value) }
+  end
+
+  def functioning?
+    # more then enabled could inform functioning?
+    # such as an administrative or AAF lock
+    enabled
+  end
+
+  def validate
+    validates_presence [:name, :mail, :enabled, :complete]
+    validates_presence [:targeted_id, :shared_token] if complete?
+  end
+end
+```
+
+##### RSpec shared examples
+```ruby
+require 'spec_helper'
+
+require 'gumboot/shared_examples/subjects'
+
+RSpec.describe Subject, type: :model do
+  include_examples 'Subjects'
+
+  # TODO: examples for your model extensions here
+end
+```
+
+#### API Subject
+An API Subject is an extension of the Subject concept reserved specifically for Subjects that utilise x509 client certificate verification to make requests to the applications RESTful API endpoints.
 
 Having this model live within the API module is recommended.
 

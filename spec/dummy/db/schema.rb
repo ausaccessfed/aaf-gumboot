@@ -23,4 +23,20 @@ ActiveRecord::Schema.define(version: 0) do
     t.belongs_to :role
     t.timestamps
   end
+
+  create_table :subjects do |t|
+    t.string :name
+    t.string :mail
+    t.string :targeted_id
+    t.string :shared_token
+    t.boolean :enabled
+    t.boolean :complete
+    t.timestamps
+  end
+
+  create_table :subject_roles do |t|
+    t.belongs_to :subject
+    t.belongs_to :role
+    t.timestamps
+  end
 end
