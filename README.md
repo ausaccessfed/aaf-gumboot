@@ -113,7 +113,7 @@ class Subject < Sequel::Model
 
   def validate
     validates_presence [:name, :mail, :enabled, :complete]
-    validates_presence [:targeted_id, :shared_token] if :complete?
+    validates_presence [:targeted_id, :shared_token] if complete?
   end
 end
 ```
