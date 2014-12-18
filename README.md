@@ -264,7 +264,7 @@ See `spec/dummy/app/controllers/api/api_controller.rb` for the implementation th
 require 'openssl'
 
 module API
-  class APIController < ApplicationController
+  class APIController < ActionController::Base
     Forbidden = Class.new(StandardError)
     private_constant :Forbidden
     rescue_from Forbidden, with: :forbidden
@@ -351,7 +351,7 @@ Routing to the appropriate controller for handling API requests **must** be unde
 ##### Rails 4.x
 Appropriate routing in a Rails 4.x application can be achieved as follows
 
-`lib/api_constraints.rb` 
+`lib/api_constraints.rb`
 
 ```ruby
 class ApiConstraints

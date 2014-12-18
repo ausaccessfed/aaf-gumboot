@@ -1,7 +1,7 @@
 require 'openssl'
 
 module API
-  class APIController < ApplicationController
+  class APIController < ActionController::Base
     Forbidden = Class.new(StandardError)
     private_constant :Forbidden
     rescue_from Forbidden, with: :forbidden
