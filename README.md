@@ -1,5 +1,5 @@
 # AAF Gumboot
-Subjects, APISubjects, Roles, Permissions, Access Control, RESTful APIs, the endless stream of possible Gems. 
+Subjects, APISubjects, Roles, Permissions, Access Control, RESTful APIs, Events and the endless stream of possible Gems.
 
 Gumboot sloshes through these **muddy** topics for AAF applications but leaves the actual hard work upto developers because Gumboots do nothing on their own.
 
@@ -10,21 +10,26 @@ Gumboot sloshes through these **muddy** topics for AAF applications but leaves t
 The way we build ruby applications has tried to be standardised as much as possible at a base layer. You're likely going to want all these Gems in your Gemfile for a Rails app or a considerable subset of them for a non Rails app.
 
 ```ruby
+gem 'rails', '4.1.8' # Ensure latest release
+gem 'mysql2'
+
 gem 'aaf-lipstick'
 gem 'accession'
+gem 'thumper'
+
 gem 'unicorn', require: false
 
 group :development, :test do
   gem 'rspec-rails', '~> 3.1.0'
   gem 'shoulda-matchers'
-  
+
   gem 'factory_girl_rails'
   gem 'faker'
- 
+
   gem 'rubocop', require: false
   gem 'simplecov', require: false
   gem 'coveralls'
-  
+
   gem 'guard', require: false
   gem 'guard-bundler', require: false
   gem 'guard-rubocop', require: false
@@ -38,7 +43,7 @@ end
 And then execute:
 
     $ bundle
-	
+
 ## Acronyms
 
 Before getting started it is **strongly recommended** that you ensure 'API' is an acronym within your application
@@ -70,7 +75,7 @@ An API Subject is a logical extension of the Subject concept reserved specifical
 
 Having this model live within the API module is recommended.
 
-##### Active Model 
+##### Active Model
 ``` ruby
 module API
   class APISubject < ActiveRecord::Base
@@ -78,7 +83,7 @@ module API
 
     has_many :api_subject_roles
     has_many :roles, through: :api_subject_roles
-    
+
     validates :x509_dn, presence: true
     validates :description, presence: true
     validates :email, presence: true
@@ -122,7 +127,7 @@ require 'gumboot/shared_examples/api_subjects'
 
 RSpec.describe API::APISubject, type: :model do
   include_examples 'API Subjects'
-  
+
   # TODO: examples for your model extensions here
 end
 ```
@@ -162,7 +167,7 @@ require 'gumboot/shared_examples/roles'
 
 RSpec.describe Role, type: :model do
   include_examples 'Roles'
-  
+
   # TODO: examples for your model extensions here
 end
 ```
@@ -199,10 +204,16 @@ require 'gumboot/shared_examples/permissions'
 
 RSpec.describe Permission, type: :model do
   include_examples 'Permissions'
-  
+
   # TODO: examples for your model extensions here
 end
 ```
+
+### Access Control
+TODO
+
+### Controllers
+TODO
 
 ### RESTful API
 
@@ -244,8 +255,10 @@ To ensure all AAF API work the same a base controller for all API related contro
 
 Having this controller live within an API module is recommended.
 
-##### Rails 4.x
-See spec/dummy/app/controllers/api/api_controller.rb for the implementation this example is based on
+##### Contollers
+
+###### Rails 4.x
+See `spec/dummy/app/controllers/api/api_controller.rb` for the implementation this example is based on
 
 ```ruby
 require 'openssl'
@@ -275,6 +288,14 @@ module API
     protected
 
     def ensure_authenticated!
+      # Ensure API subject exists and is functioning
+      @subject = APISubject.find_by!(x509_cn: x509_cn)
+      fail(Unauthorized, 'Subject not functional') unless @subject.functioning?
+    rescue ActiveRecord::RecordNotFound
+      raise(Unauthorized, 'Subject invalid')
+    end
+
+    def x509_cn
       # Verified DN pushed by nginx following successful client SSL verification
       # nginx is always going to do a better job of terminating SSL then we can
       x509_dn = request.headers['HTTP_X509_DN'].try(:force_encoding, 'UTF-8')
@@ -282,19 +303,13 @@ module API
 
       x509_dn_parsed = OpenSSL::X509::Name.parse(x509_dn)
       x509_dn_hash = Hash[x509_dn_parsed.to_a
-                          .map{ |components| components[0..1] }]
-      x509_cn = x509_dn_hash['CN']
-      fail(Unauthorized, 'Subject CN invalid') unless x509_cn
+                          .map { |components| components[0..1] }]
 
-      # Ensure API subject exists and is functioning
-      @subject = APISubject.find_by!(x509_cn: x509_cn)
-      fail(Unauthorized, 'Subject not functional') unless @subject.functioning?
-    rescue OpenSSL::X509::NameError
-      fail(Unauthorized, 'Subject DN invalid')
-    rescue ActiveRecord::RecordNotFound
-      fail(Unauthorized, 'Subject invalid')
+      x509_dn_hash['CN'] || fail(Unauthorized, 'Subject CN invalid')
+
+      rescue OpenSSL::X509::NameError
+        raise(Unauthorized, 'Subject DN invalid')
     end
-
 
     def check_access!(action)
       fail(Forbidden) unless @subject.permits?(action)
@@ -317,7 +332,6 @@ module API
     end
   end
 end
-
 ```
 
 ##### RSpec shared examples
@@ -337,7 +351,7 @@ Routing to the appropriate controller for handling API requests **must** be unde
 ##### Rails 4.x
 Appropriate routing in a Rails 4.x application can be achieved as follows
 
-lib/api_constraints.rb
+`lib/api_constraints.rb` 
 
 ```ruby
 class ApiConstraints
@@ -352,7 +366,7 @@ class ApiConstraints
 end
 ```
 
-config/routes.rb
+`config/routes.rb`
 
 ```ruby
 require 'api_constraints'
@@ -371,3 +385,6 @@ This method has controllers living within the API::VX module and naturally exten
 
 ##### RSpec shared examples
 Not provided at this time.
+
+## Event Handling
+TODO - Publishing and consuming events from AAF AMQP.
