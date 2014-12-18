@@ -24,10 +24,6 @@ RSpec.shared_examples 'API base controller' do
       end
     end
 
-    it 'is extended by anon controller' do
-      expect(controller).to be_a_kind_of(described_class)
-    end
-
     context '#before_action' do
       subject { response }
       let(:json) { JSON.parse(subject.body) }
