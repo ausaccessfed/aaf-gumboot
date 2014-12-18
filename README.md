@@ -261,7 +261,7 @@ module API
     rescue_from Unauthorized, with: :unauthorized
 
     protect_from_forgery with: :null_session
-    before_action :authenticated?
+    before_action :ensure_authenticated!
 
     attr_reader :subject
 
@@ -274,7 +274,7 @@ module API
 
     protected
 
-    def authenticated?
+    def ensure_authenticated!
       # Verified DN pushed by nginx following successful client SSL verification
       # nginx is always going to do a better job of terminating SSL then we can
       x509_dn = request.headers['HTTP_X509_DN'].try(:force_encoding, 'UTF-8')
