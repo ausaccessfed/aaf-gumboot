@@ -1,6 +1,9 @@
 FactoryGirl.define do
   factory :api_subject, class: API::APISubject do
-    x509_dn { "cn=#{Faker::Internet.domain_name},o='#{Faker::Company.name}'" }
+    x509_cn { Faker::Lorem.word }
+    description { Faker::Lorem.sentence }
+    email { Faker::Internet.email }
+    enabled true
 
     trait :authorized do
       transient { permission '*' }

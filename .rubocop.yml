@@ -7,4 +7,5 @@ Style/FileName:
 
 AllCops:
   Exclude:
+    - Guardfile
     - spec/dummy/**/*

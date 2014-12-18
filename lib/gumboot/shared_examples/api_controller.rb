@@ -28,11 +28,104 @@ RSpec.shared_examples 'API base controller' do
       expect(controller).to be_a_kind_of(described_class)
     end
 
+    context '#before_action' do
+      subject { response }
+      let(:json) { JSON.parse(subject.body) }
+
+      context 'no x509 header set by nginx' do
+        before { get :an_action }
+
+        it { is_expected.to have_http_status(:unauthorized) }
+
+        context 'json within response' do
+          it 'has a message' do
+            expect(json['message']).to eq('SSL client failure.')
+          end
+          it 'has an error' do
+            expect(json['error']).to eq('Subject DN')
+          end
+        end
+      end
+
+      context 'invalid x509 header set by nginx' do
+        before do
+          request.env['HTTP_X509_DN'] = "Z=#{Faker::Lorem.word}"
+          get :an_action
+        end
+
+        it { is_expected.to have_http_status(:unauthorized) }
+        context 'json within response' do
+          it 'has a message' do
+            expect(json['message']).to eq('SSL client failure.')
+          end
+          it 'has an error' do
+            expect(json['error']).to eq('Subject DN invalid')
+          end
+        end
+      end
+
+      context 'without a CN component to DN' do
+        before do
+          request.env['HTTP_X509_DN'] = "O=#{Faker::Lorem.word}"
+          get :an_action
+        end
+
+        it { is_expected.to have_http_status(:unauthorized) }
+        context 'json within response' do
+          it 'has a message' do
+            expect(json['message']).to eq('SSL client failure.')
+          end
+          it 'has an error' do
+            expect(json['error']).to eq('Subject CN invalid')
+          end
+        end
+      end
+
+      context 'with a CN that does not represent an APISubject' do
+        before do
+          request.env['HTTP_X509_DN'] = "CN=#{Faker::Lorem.word}/" \
+                                        "O=#{Faker::Lorem.word}"
+          get :an_action
+        end
+
+        it { is_expected.to have_http_status(:unauthorized) }
+        context 'json within response' do
+          it 'has a message' do
+            expect(json['message']).to eq('SSL client failure.')
+          end
+          it 'has an error' do
+            expect(json['error']).to eq('Subject invalid')
+          end
+        end
+      end
+
+      context 'with an APISubject that is not functioning' do
+        let(:api_subject) { create :api_subject, enabled: false }
+
+        before do
+          request.env['HTTP_X509_DN'] = "CN=#{api_subject.x509_cn}/" \
+                                        "O=#{Faker::Lorem.word}"
+          get :an_action
+        end
+
+        it { is_expected.to have_http_status(:unauthorized) }
+        context 'json within response' do
+          it 'has a message' do
+            expect(json['message']).to eq('SSL client failure.')
+          end
+          it 'has an error' do
+            expect(json['error']).to eq('Subject not functional')
+          end
+        end
+      end
+    end
+
     context '#after_action' do
       subject(:api_subject) { create :api_subject }
+      let(:json) { JSON.parse(response.body) }
 
       before do
-        request.env['HTTP_X509_DN'] = api_subject.x509_dn
+        request.env['HTTP_X509_DN'] = "CN=#{api_subject.x509_cn}/DC=example"
       end
 
       RSpec.shared_examples 'base state' do
@@ -54,9 +147,15 @@ RSpec.shared_examples 'API base controller' do
           expect(api_subject.permissions).to eq([])
         end
 
-        it 'fails request when permissions checked' do
-          get :an_action
-          expect(response).to have_http_status(:forbidden)
+        context 'the request does not complete' do
+          before { get :an_action }
+          it 'should respond with status code :forbidden (403)' do
+            expect(response).to have_http_status(:forbidden)
+          end
+          it 'recieves a json message' do
+            expect(json['message'])
+              .to eq('The request was understood but explicitly denied.')
+          end
         end
       end
 
@@ -71,9 +170,15 @@ RSpec.shared_examples 'API base controller' do
           expect(api_subject.permissions).to eq(['invalid:permission'])
         end
 
-        it 'fails request when permissions checked' do
-          get :an_action
-          expect(response).to have_http_status(:forbidden)
+        context 'the request does not complete' do
+          before { get :an_action }
+          it 'should respond with status code :forbidden (403)' do
+            expect(response).to have_http_status(:forbidden)
+          end
+          it 'recieves a json message' do
+            expect(json['message'])
+              .to eq('The request was understood but explicitly denied.')
+          end
         end
       end
 
