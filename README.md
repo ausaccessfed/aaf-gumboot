@@ -292,7 +292,80 @@ end
 TODO
 
 ### Controllers
-TODO
+
+AAF applications must utilise controllers which default to verifying authentication and access control on every request. This can be changed as implementations require to be publicly accessible for example but must be explicitly configured in code to make it clear to all.
+
+###### Rails 4.x
+See `spec/dummy/app/controllers/application_controller.rb` for the implementation this example is based on
+
+``` ruby
+class ApplicationController < ActionController::Base
+  Forbidden = Class.new(StandardError)
+  private_constant :Forbidden
+  rescue_from Forbidden, with: :forbidden
+
+  Unauthorized = Class.new(StandardError)
+  private_constant :Unauthorized
+  rescue_from Unauthorized, with: :unauthorized
+
+  protect_from_forgery with: :exception
+  before_action :ensure_authenticated
+  after_action :ensure_access_checked
+
+  def subject
+    subject = session[:subject_id] && Subject.find_by_id(session[:subject_id])
+    return nil unless subject.try(:functioning?)
+    @subject = subject
+  end
+
+  protected
+
+  def ensure_authenticated
+    return redirect_to('/auth/login') unless session[:subject_id]
+
+    @subject = Subject.find(session[:subject_id])
+    fail(Unauthorized, 'Subject not functional') unless @subject.functioning?
+  rescue ActiveRecord::RecordNotFound
+    raise(Unauthorized, 'Subject invalid')
+  end
+
+  def ensure_access_checked
+    return if @access_checked
+
+    method = "#{self.class.name}##{params[:action]}"
+    fail("No access control performed by #{method}")
+  end
+
+  def check_access!(action)
+    fail(Forbidden) unless subject.permits?(action)
+    @access_checked = true
+  end
+
+  def public_action
+    @access_checked = true
+  end
+
+  def unauthorized
+    reset_session
+    render 'errors/unauthorized', status: :unauthorized
+  end
+
+  def forbidden
+    render 'errors/forbidden', status: :forbidden
+  end
+end
+```
+
+##### RSpec shared examples
+``` ruby
+require 'spec_helper'
+
+require 'gumboot/shared_examples/application_controller'
+
+RSpec.describe ApplicationController, type: :controller do
+  include_examples 'Application controller'
+end
+```
 
 ### RESTful API
 
