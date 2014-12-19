@@ -13,11 +13,11 @@ FactoryGirl.define do
     trait :authorized do
       transient { permission '*' }
 
-      after(:create) do |api_subject, attrs|
+      after(:create) do |subject, attrs|
         role = create :role
         permission = create :permission, value: attrs.permission, role: role
         role.permissions << permission
-        role.api_subjects << api_subject
+        role.subjects << subject
       end
     end
   end
