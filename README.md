@@ -1,9 +1,9 @@
 # AAF Gumboot
 Subjects, APISubjects, Roles, Permissions, Access Control, RESTful APIs, Events and the endless stream of possible Gems.
 
-Gumboot sloshes through these **muddy** topics for AAF applications but leaves the actual hard work upto developers because Gumboots do nothing on their own.
+Gumboot sloshes through these **muddy** topics for AAF applications, bringing down swift justice where it finds problems.
 
-![](http://i.imgur.com/ImJXacR.jpg)
+![](http://i.imgur.com/XP4Yw6e.jpg)
 
 ## Gems
 
