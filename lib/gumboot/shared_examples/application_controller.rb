@@ -61,7 +61,7 @@ RSpec.shared_examples 'Application controller' do
     context '#ensure_access_checked as after_action' do
       before { session[:subject_id] = subject.id }
 
-      RSpec.shared_examples 'base state' do
+      RSpec.shared_examples 'ApplicationController base state' do
         it 'fails request to incorrectly implemented action' do
           msg = 'No access control performed by AnonymousController#bad_action'
           expect { get :bad_action }.to raise_error(msg)
@@ -76,7 +76,7 @@ RSpec.shared_examples 'Application controller' do
       context 'subject without permissions' do
         subject(:subject) { create :subject }
 
-        include_examples 'base state'
+        include_examples 'ApplicationController base state'
 
         it 'has no permissions' do
           expect(subject.permissions).to eq([])
@@ -98,7 +98,7 @@ RSpec.shared_examples 'Application controller' do
           create :subject, :authorized, permission: 'invalid:permission'
         end
 
-        include_examples 'base state'
+        include_examples 'ApplicationController base state'
 
         it 'has an invalid permission' do
           expect(subject.permissions).to eq(['invalid:permission'])
@@ -120,7 +120,7 @@ RSpec.shared_examples 'Application controller' do
           create :subject, :authorized, permission: 'required:permission'
         end
 
-        include_examples 'base state'
+        include_examples 'ApplicationController base state'
 
         it 'has a valid permission' do
           expect(subject.permissions).to eq(['required:permission'])

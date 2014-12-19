@@ -114,7 +114,7 @@ RSpec.shared_examples 'API base controller' do
         request.env['HTTP_X509_DN'] = "CN=#{api_subject.x509_cn}/DC=example"
       end
 
-      RSpec.shared_examples 'base state' do
+      RSpec.shared_examples 'APIController base state' do
         it 'fails request to incorrectly implemented action' do
           msg = 'No access control performed by API::APIController#bad_action'
           expect { get :bad_action }.to raise_error(msg)
@@ -127,7 +127,7 @@ RSpec.shared_examples 'API base controller' do
       end
 
       context 'subject without permissions' do
-        include_examples 'base state'
+        include_examples 'APIController base state'
 
         it 'has no permissions' do
           expect(api_subject.permissions).to eq([])
@@ -150,7 +150,7 @@ RSpec.shared_examples 'API base controller' do
           create :api_subject, :authorized, permission: 'invalid:permission'
         end
 
-        include_examples 'base state'
+        include_examples 'APIController base state'
 
         it 'has an invalid permission' do
           expect(api_subject.permissions).to eq(['invalid:permission'])
@@ -173,7 +173,7 @@ RSpec.shared_examples 'API base controller' do
           create :api_subject, :authorized, permission: 'required:permission'
         end
 
-        include_examples 'base state'
+        include_examples 'APIController base state'
 
         it 'has a valid permission' do
           expect(api_subject.permissions).to eq(['required:permission'])
