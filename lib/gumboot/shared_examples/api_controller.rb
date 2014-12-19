@@ -1,20 +1,9 @@
+require 'gumboot/shared_examples/anonymous_controller'
+
 RSpec.shared_examples 'API base controller' do
-  context 'API Base Controller' do
-    controller(described_class) do
-      def an_action
-        check_access!('required:permission')
-        render nothing: true
-      end
+  context 'AAF shared implementation' do
 
-      def bad_action
-        render nothing: true
-      end
-
-      def public
-        public_action
-        render nothing: true
-      end
-    end
+    include_examples 'Anon controller'
 
     before do
       @routes.draw do
