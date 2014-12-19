@@ -11,7 +11,11 @@ class ApplicationController < ActionController::Base
   before_action :ensure_authenticated
   after_action :ensure_access_checked
 
-  attr_reader :subject
+  def subject
+    subject = session[:subject_id] && Subject.find_by_id(session[:subject_id])
+    return nil unless subject.try(:functioning?)
+    @subject = subject
+  end
 
   protected
 

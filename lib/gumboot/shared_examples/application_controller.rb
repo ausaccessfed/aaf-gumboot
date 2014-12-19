@@ -12,7 +12,54 @@ RSpec.shared_examples 'Application controller' do
       end
     end
 
-    it { is_expected.to respond_to(:subject) }
+    context '#subject' do
+      context 'No subject ID is set in session' do
+        before do
+          session[:subject_id] = nil
+        end
+
+        it 'returns nil' do
+          expect(subject.subject).to be_nil
+        end
+        it 'does not set @subject' do
+          expect(@subject).to be_nil
+        end
+      end
+
+      context 'session has subject_id that does not represent a Subject' do
+        before do
+          session[:subject_id] = -1
+        end
+
+        it 'returns nil' do
+          expect(subject.subject).to be_nil
+        end
+      end
+
+      context 'Subject that is not functioning' do
+        let(:current_subject) { create :subject, enabled: false }
+
+        before do
+          session[:subject_id] = current_subject.id
+        end
+
+        it 'returns nil' do
+          expect(subject.subject).to be_nil
+        end
+      end
+
+      context 'Subject is valid' do
+        let(:current_subject) { create :subject }
+
+        before do
+          session[:subject_id] = current_subject.id
+        end
+
+        it 'returns subject' do
+          expect(subject.subject).to eq(current_subject)
+        end
+      end
+    end
 
     context '#ensure_authenticated as before_action' do
       subject { response }
