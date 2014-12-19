@@ -21,9 +21,6 @@ RSpec.shared_examples 'Application controller' do
         it 'returns nil' do
           expect(subject.subject).to be_nil
         end
-        it 'does not set @subject' do
-          expect(@subject).to be_nil
-        end
       end
 
       context 'session has subject_id that does not represent a Subject' do
