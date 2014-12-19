@@ -18,7 +18,10 @@ RSpec.shared_examples 'Application controller' do
       subject { response }
 
       context 'No subject ID is set in session' do
-        before { get :an_action }
+        before do
+          session[:subject_id] = nil
+          get :an_action
+        end
 
         it { is_expected.to have_http_status(:redirect) }
         it { is_expected.to redirect_to('/auth/login') }
