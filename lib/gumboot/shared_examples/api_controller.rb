@@ -1,20 +1,8 @@
+require 'gumboot/shared_examples/anonymous_controller'
+
 RSpec.shared_examples 'API base controller' do
-  context 'API Base Controller' do
-    controller(described_class) do
-      def an_action
-        check_access!('required:permission')
-        render nothing: true
-      end
-
-      def bad_action
-        render nothing: true
-      end
-
-      def public
-        public_action
-        render nothing: true
-      end
-    end
+  context 'AAF shared implementation' do
+    include_examples 'Anon controller'
 
     before do
       @routes.draw do
@@ -24,7 +12,9 @@ RSpec.shared_examples 'API base controller' do
       end
     end
 
-    context '#before_action' do
+    it { is_expected.to respond_to(:subject) }
+
+    context '#ensure_authenticated as before_action' do
       subject { response }
       let(:json) { JSON.parse(subject.body) }
 
@@ -116,7 +106,7 @@ RSpec.shared_examples 'API base controller' do
       end
     end
 
-    context '#after_action' do
+    context '#ensure_access_checked as after_action' do
       subject(:api_subject) { create :api_subject }
       let(:json) { JSON.parse(response.body) }
 
@@ -124,7 +114,7 @@ RSpec.shared_examples 'API base controller' do
         request.env['HTTP_X509_DN'] = "CN=#{api_subject.x509_cn}/DC=example"
       end
 
-      RSpec.shared_examples 'base state' do
+      RSpec.shared_examples 'APIController base state' do
         it 'fails request to incorrectly implemented action' do
           msg = 'No access control performed by API::APIController#bad_action'
           expect { get :bad_action }.to raise_error(msg)
@@ -137,7 +127,7 @@ RSpec.shared_examples 'API base controller' do
       end
 
       context 'subject without permissions' do
-        include_examples 'base state'
+        include_examples 'APIController base state'
 
         it 'has no permissions' do
           expect(api_subject.permissions).to eq([])
@@ -160,7 +150,7 @@ RSpec.shared_examples 'API base controller' do
           create :api_subject, :authorized, permission: 'invalid:permission'
         end
 
-        include_examples 'base state'
+        include_examples 'APIController base state'
 
         it 'has an invalid permission' do
           expect(api_subject.permissions).to eq(['invalid:permission'])
@@ -183,7 +173,7 @@ RSpec.shared_examples 'API base controller' do
           create :api_subject, :authorized, permission: 'required:permission'
         end
 
-        include_examples 'base state'
+        include_examples 'APIController base state'
 
         it 'has a valid permission' do
           expect(api_subject.permissions).to eq(['required:permission'])

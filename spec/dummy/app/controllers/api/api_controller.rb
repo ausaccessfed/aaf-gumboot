@@ -11,25 +11,26 @@ module API
     rescue_from Unauthorized, with: :unauthorized
 
     protect_from_forgery with: :null_session
-    before_action :ensure_authenticated!
+    before_action :ensure_authenticated
+    after_action :ensure_access_checked
 
     attr_reader :subject
 
-    after_action do
-      unless @access_checked
-        method = "#{self.class.name}##{params[:action]}"
-        fail("No access control performed by #{method}")
-      end
-    end
-
     protected
 
-    def ensure_authenticated!
+    def ensure_authenticated
       # Ensure API subject exists and is functioning
       @subject = APISubject.find_by!(x509_cn: x509_cn)
       fail(Unauthorized, 'Subject not functional') unless @subject.functioning?
     rescue ActiveRecord::RecordNotFound
       raise(Unauthorized, 'Subject invalid')
+    end
+
+    def ensure_access_checked
+      return if @access_checked
+
+      method = "#{self.class.name}##{params[:action]}"
+      fail("No access control performed by #{method}")
     end
 
     def x509_cn

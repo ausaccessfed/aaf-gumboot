@@ -1,9 +1,9 @@
 # AAF Gumboot
 Subjects, APISubjects, Roles, Permissions, Access Control, RESTful APIs, Events and the endless stream of possible Gems.
 
-Gumboot sloshes through these **muddy** topics for AAF applications but leaves the actual hard work upto developers because Gumboots do nothing on their own.
+Gumboot sloshes through these **muddy** topics for AAF applications, bringing down swift justice where it finds problems.
 
-![](http://i.imgur.com/ImJXacR.jpg)
+![](http://i.imgur.com/XP4Yw6e.jpg)
 
 ## Gems
 
@@ -213,6 +213,10 @@ The term *Role* is thrown around a lot and it's meaning is very diluted. For our
 class Role < ActiveRecord::Base
   has_many :api_subject_roles, class_name: 'API::APISubjectRole'
   has_many :api_subjects, through: :api_subject_roles
+
+  has_many :subject_roles
+  has_many :subjects, through: :subject_roles
+
   has_many :permissions
 
   validates :name, presence: true
@@ -223,7 +227,9 @@ end
 ``` ruby
 class Role < Sequel::Model
   one_to_many :permissions
+
   many_to_many :api_subjects, class: 'API::APISubject'
+  many_to_many :subjects
 
   def validate
     super
@@ -286,7 +292,80 @@ end
 TODO
 
 ### Controllers
-TODO
+
+AAF applications must utilise controllers which default to verifying authentication and access control on every request. This can be changed as implementations require to be publicly accessible for example but must be explicitly configured in code to make it clear to all.
+
+###### Rails 4.x
+See `spec/dummy/app/controllers/application_controller.rb` for the implementation this example is based on
+
+``` ruby
+class ApplicationController < ActionController::Base
+  Forbidden = Class.new(StandardError)
+  private_constant :Forbidden
+  rescue_from Forbidden, with: :forbidden
+
+  Unauthorized = Class.new(StandardError)
+  private_constant :Unauthorized
+  rescue_from Unauthorized, with: :unauthorized
+
+  protect_from_forgery with: :exception
+  before_action :ensure_authenticated
+  after_action :ensure_access_checked
+
+  def subject
+    subject = session[:subject_id] && Subject.find_by_id(session[:subject_id])
+    return nil unless subject.try(:functioning?)
+    @subject = subject
+  end
+
+  protected
+
+  def ensure_authenticated
+    return redirect_to('/auth/login') unless session[:subject_id]
+
+    @subject = Subject.find(session[:subject_id])
+    fail(Unauthorized, 'Subject not functional') unless @subject.functioning?
+  rescue ActiveRecord::RecordNotFound
+    raise(Unauthorized, 'Subject invalid')
+  end
+
+  def ensure_access_checked
+    return if @access_checked
+
+    method = "#{self.class.name}##{params[:action]}"
+    fail("No access control performed by #{method}")
+  end
+
+  def check_access!(action)
+    fail(Forbidden) unless subject.permits?(action)
+    @access_checked = true
+  end
+
+  def public_action
+    @access_checked = true
+  end
+
+  def unauthorized
+    reset_session
+    render 'errors/unauthorized', status: :unauthorized
+  end
+
+  def forbidden
+    render 'errors/forbidden', status: :forbidden
+  end
+end
+```
+
+##### RSpec shared examples
+``` ruby
+require 'spec_helper'
+
+require 'gumboot/shared_examples/application_controller'
+
+RSpec.describe ApplicationController, type: :controller do
+  include_examples 'Application controller'
+end
+```
 
 ### RESTful API
 
@@ -347,25 +426,26 @@ module API
     rescue_from Unauthorized, with: :unauthorized
 
     protect_from_forgery with: :null_session
-    before_action :ensure_authenticated!
+    before_action :ensure_authenticated
+    after_action :ensure_access_checked
 
     attr_reader :subject
 
-    after_action do
-      unless @access_checked
-        method = "#{self.class.name}##{params[:action]}"
-        fail("No access control performed by #{method}")
-      end
-    end
-
     protected
 
-    def ensure_authenticated!
+    def ensure_authenticated
       # Ensure API subject exists and is functioning
       @subject = APISubject.find_by!(x509_cn: x509_cn)
       fail(Unauthorized, 'Subject not functional') unless @subject.functioning?
     rescue ActiveRecord::RecordNotFound
       raise(Unauthorized, 'Subject invalid')
+    end
+
+    def ensure_access_checked
+      return if @access_checked
+
+      method = "#{self.class.name}##{params[:action]}"
+      fail("No access control performed by #{method}")
     end
 
     def x509_cn
@@ -405,6 +485,7 @@ module API
     end
   end
 end
+
 ```
 
 ##### RSpec shared examples
