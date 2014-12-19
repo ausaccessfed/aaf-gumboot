@@ -14,7 +14,7 @@ RSpec.shared_examples 'API base controller' do
 
     it { is_expected.to respond_to(:subject) }
 
-    context '#before_action' do
+    context '#ensure_authenticated as before_action' do
       subject { response }
       let(:json) { JSON.parse(subject.body) }
 
@@ -106,7 +106,7 @@ RSpec.shared_examples 'API base controller' do
       end
     end
 
-    context '#after_action' do
+    context '#ensure_access_checked as after_action' do
       subject(:api_subject) { create :api_subject }
       let(:json) { JSON.parse(response.body) }
 

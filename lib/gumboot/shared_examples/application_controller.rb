@@ -14,7 +14,7 @@ RSpec.shared_examples 'Application controller' do
 
     it { is_expected.to respond_to(:subject) }
 
-    context '#before_action' do
+    context '#ensure_authenticated as before_action' do
       subject { response }
 
       context 'No subject ID is set in session' do
@@ -55,7 +55,7 @@ RSpec.shared_examples 'Application controller' do
       end
     end
 
-    context '#after_action' do
+    context '#ensure_access_checked as after_action' do
       before { session[:subject_id] = subject.id }
 
       RSpec.shared_examples 'base state' do
