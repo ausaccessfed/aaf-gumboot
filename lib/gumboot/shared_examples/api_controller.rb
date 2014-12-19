@@ -12,6 +12,8 @@ RSpec.shared_examples 'API base controller' do
       end
     end
 
+    it { is_expected.to respond_to(:subject) }
+
     context '#before_action' do
       subject { response }
       let(:json) { JSON.parse(subject.body) }
