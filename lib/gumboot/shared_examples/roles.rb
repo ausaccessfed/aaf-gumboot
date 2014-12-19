@@ -4,6 +4,7 @@ RSpec.shared_examples 'Roles' do
 
     it { is_expected.to be_valid }
     it { is_expected.to respond_to(:api_subjects) }
+    it { is_expected.to respond_to(:subjects) }
     it { is_expected.to respond_to(:permissions) }
 
     it 'is invalid without a name' do

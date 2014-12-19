@@ -213,6 +213,10 @@ The term *Role* is thrown around a lot and it's meaning is very diluted. For our
 class Role < ActiveRecord::Base
   has_many :api_subject_roles, class_name: 'API::APISubjectRole'
   has_many :api_subjects, through: :api_subject_roles
+
+  has_many :subject_roles
+  has_many :subjects, through: :subject_roles
+
   has_many :permissions
 
   validates :name, presence: true
@@ -223,7 +227,9 @@ end
 ``` ruby
 class Role < Sequel::Model
   one_to_many :permissions
+
   many_to_many :api_subjects, class: 'API::APISubject'
+  many_to_many :subjects
 
   def validate
     super
