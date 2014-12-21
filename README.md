@@ -503,7 +503,7 @@ end
 Routing to the appropriate controller for handling API requests **must** be undertaken using content within the Accept header.
 
 ##### Rails 4.x
-Appropriate routing in a Rails 4.x application can be achieved as follows
+Appropriate routing in a Rails 4.x application can be achieved as follows. Ensure you replace instances of *<your application name>* with something unique to the application i.e for the application named 'SAML service' we might use **`application/vnd.aaf.saml-service.v1+json`**
 
 `lib/api_constraints.rb`
 
@@ -538,7 +538,24 @@ end
 This method has controllers living within the API::VX module and naturally extending the APIController documented above.
 
 ##### RSpec shared examples
-Not provided at this time.
+``` ruby
+require 'spec_helper'
+
+require 'gumboot/shared_examples/api_constraints'
+
+require 'api_constraints'
+
+RSpec.describe APIConstraints do
+  let(:matching_request) do
+    double(headers: { 'Accept' => 'application/vnd.aaf.<your application name>.v1+json' })
+  end
+  let(:non_matching_request) do
+    double(headers: { 'Accept' => 'application/vnd.aaf.<your application name>.v2+json' })
+  end
+
+  include_examples 'API constraints'
+end
+```
 
 ## Event Handling
 TODO - Publishing and consuming events from AAF AMQP.
