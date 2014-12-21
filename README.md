@@ -503,7 +503,7 @@ end
 Routing to the appropriate controller for handling API requests **must** be undertaken using content within the Accept header.
 
 ##### Rails 4.x
-Appropriate routing in a Rails 4.x application can be achieved as follows. Ensure your replace instances of *<your application name>* with something unique to your application i.e for the application named 'SAML service' we might use **`application/vnd.aaf.saml-service.v1+json`**
+Appropriate routing in a Rails 4.x application can be achieved as follows. Ensure you replace instances of *<your application name>* with something unique to the application i.e for the application named 'SAML service' we might use **`application/vnd.aaf.saml-service.v1+json`**
 
 `lib/api_constraints.rb`
 
