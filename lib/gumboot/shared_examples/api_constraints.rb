@@ -1,12 +1,5 @@
 RSpec.shared_examples 'API constraints' do
   context 'AAF shared implementation' do
-    before do
-      allow(matching_request).to receive(:headers)
-        .and_return('Accept' => matching_header)
-      allow(non_matching_request).to receive(:headers)
-        .and_return('Accept' => non_matching_header)
-    end
-
     context '#matches?' do
       context 'with default: false' do
         subject { described_class.new(version: '1', default: false) }
