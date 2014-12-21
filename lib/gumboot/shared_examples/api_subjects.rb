@@ -17,8 +17,12 @@ RSpec.shared_examples 'API Subjects' do
       subject.description = nil
       expect(subject).not_to be_valid
     end
+    it 'is invalid without a contact name' do
+      subject.contact_name = nil
+      expect(subject).not_to be_valid
+    end
     it 'is invalid without a contact mail address' do
-      subject.mail = nil
+      subject.contact_mail = nil
       expect(subject).not_to be_valid
     end
     it 'is invalid without an enabled state' do
