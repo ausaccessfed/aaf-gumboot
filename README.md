@@ -146,8 +146,7 @@ module API
     has_many :roles, through: :api_subject_roles
 
     validates :x509_cn, presence: true
-    validates :description, presence: true
-    validates :mail, presence: true
+    validates :contact_name, :contact_mail, :description, presence: true
     validates :enabled, inclusion: [true, false]
 
     def permissions
@@ -163,6 +162,7 @@ module API
     end
   end
 end
+
 ```
 
 ##### Sequel
@@ -186,7 +186,8 @@ module API
     end
 
     def validate
-      validates_presence [:x509_cn, :description, :mail, :enabled]
+      validates_presence [:x509_cn, :description,
+                          :contact_name, :contact_mail, :enabled]
     end
   end
 end
