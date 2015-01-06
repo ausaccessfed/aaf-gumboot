@@ -20,10 +20,9 @@ module API
 
     def ensure_authenticated
       # Ensure API subject exists and is functioning
-      @subject = APISubject.find_by!(x509_cn: x509_cn)
+      @subject = APISubject.find_by(x509_cn: x509_cn)
+      fail(Unauthorized, 'Subject invalid') unless @subject
       fail(Unauthorized, 'Subject not functional') unless @subject.functioning?
-    rescue ActiveRecord::RecordNotFound
-      raise(Unauthorized, 'Subject invalid')
     end
 
     def ensure_access_checked
