@@ -86,9 +86,9 @@ class Subject < ActiveRecord::Base
   end
 
   def functioning?
-    # more then enabled could inform functioning?
+    # more than enabled? could inform functioning?
     # such as an administrative or AAF lock
-    enabled
+    enabled?
   end
 end
 ```
@@ -106,9 +106,9 @@ class Subject < Sequel::Model
   end
 
   def functioning?
-    # more then enabled could inform functioning?
+    # more than enabled? could inform functioning?
     # such as an administrative or AAF lock
-    enabled
+    enabled?
   end
 
   def validate
@@ -156,9 +156,9 @@ module API
     end
 
     def functioning?
-      # more then enabled could inform functioning?
+      # more than enabled? could inform functioning?
       # such as an administrative or AAF lock
-      enabled
+      enabled?
     end
   end
 end
@@ -180,9 +180,9 @@ module API
     end
 
     def functioning?
-      # more then enabled could inform functioning?
+      # more than enabled? could inform functioning?
       # such as an administrative or AAF lock
-      enabled
+      enabled?
     end
 
     def validate
