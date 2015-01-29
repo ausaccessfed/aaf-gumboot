@@ -507,14 +507,20 @@ Appropriate routing in a Rails 4.x application can be achieved as follows. Ensur
 `lib/api_constraints.rb`
 
 ```ruby
-class ApiConstraints
-  def initialize(options)
-    @version = options[:version]
-    @default = options[:default]
+class APIConstraints
+  def initialize(version:, default: false)
+    @version = version
+    @default = default
   end
 
   def matches?(req)
-    @default || req.headers['Accept'].include?("application/vnd.aaf.<your application name>.v#{@version}+json")
+    @default || req.headers['Accept'].include?(version_string)
+  end
+
+  private
+
+  def version_string
+    "application/vnd.aaf.<your application name>.v#{@version}+json"
   end
 end
 ```
@@ -527,7 +533,7 @@ require 'api_constraints'
 <Your Application>::Application.routes.draw do
 
   namespace :api, defaults: { format: 'json' } do
-    scope module: :v1, constraints: ApiConstraints.new(version: 1, default: true) do
+    scope module: :v1, constraints: APIConstraints.new(version: 1, default: true) do
       resources :xyz, param: :uid, only: [:show, :create, :update, :destroy]
     end
   end
