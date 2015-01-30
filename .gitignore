@@ -12,5 +12,6 @@
 *.o
 *.a
 mkmf.log
+Gemfile.lock
 
 /spec/dummy/log/*
