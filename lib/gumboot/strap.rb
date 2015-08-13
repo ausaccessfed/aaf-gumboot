@@ -60,10 +60,40 @@ module Gumboot
       system 'rm -rf tmp/cache'
     end
 
+    def link_global_configuration(files)
+      files.each do |file|
+        src = File.expand_path("~/.aaf/#{file}")
+        fail("Missing global config file: #{src}") unless File.exist?(src)
+
+        dest =  "config/#{file}"
+        next if File.exist?(dest)
+        FileUtils.ln_s(src, dest)
+      end
+    end
+
+    def update_local_configuration(files)
+      files.each do |file|
+        src = "config/#{file}.dist"
+        fail("Not a .yml file: #{file}") unless file.end_with?('.yml')
+        fail("Missing dist config file: #{src}") unless File.exist?(src)
+
+        merge_config(src, "config/#{file}")
+      end
+    end
+
     private
 
     def message(msg)
       puts "\n== #{msg} =="
+    end
+
+    def merge_config(src, dest)
+      new_config = YAML.load(File.read(src))
+      old_config = File.exist?(dest) ? YAML.load(File.read(dest)) : {}
+
+      File.open(dest, 'w') do |f|
+        f.write(YAML.dump(new_config.deep_merge(old_config)))
+      end
     end
   end
 end

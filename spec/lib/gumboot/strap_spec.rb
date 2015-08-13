@@ -158,4 +158,129 @@ RSpec.describe Gumboot::Strap do
       subject.clean_tempfiles
     end
   end
+
+  context '#link_global_configuration' do
+    it 'creates a symbolic link to the shared configuration' do
+      base = "#{ENV['HOME']}/.aaf"
+
+      allow(File).to receive(:exist?).with("#{base}/a").and_return(true)
+      allow(File).to receive(:exist?).with("#{base}/b").and_return(true)
+      allow(File).to receive(:exist?).with("#{base}/c").and_return(true)
+
+      allow(File).to receive(:exist?).with('config/a').and_return(false)
+      allow(File).to receive(:exist?).with('config/b').and_return(false)
+      allow(File).to receive(:exist?).with('config/c').and_return(false)
+
+      expect(FileUtils).to receive(:ln_s).with("#{base}/a", 'config/a')
+      expect(FileUtils).to receive(:ln_s).with("#{base}/b", 'config/b')
+      expect(FileUtils).to receive(:ln_s).with("#{base}/c", 'config/c')
+
+      subject.link_global_configuration(%w(a b c))
+    end
+
+    it 'skips an existing file' do
+      allow(File).to receive(:exist?).and_return(true)
+      expect(FileUtils).not_to receive(:ln_s)
+
+      subject.link_global_configuration(%w(a))
+    end
+
+    it 'raises an error for a missing file' do
+      allow(File).to receive(:exist?).and_return(false)
+      expect { subject.link_global_configuration(%w(a)) }
+        .to raise_error(/Missing global config file/)
+    end
+  end
+
+  context '#update_local_configuration' do
+    let(:dist) { YAML.dump('a' => 1, 'b' => 2) }
+    let(:target) { nil }
+
+    let(:file) { 'a.yml' }
+    let(:target_file) { "config/#{file}" }
+    let(:dist_file) { "config/#{file}.dist" }
+    let(:written) { [] }
+
+    before do
+      allow(File).to receive(:exist?).with(target_file).and_return(target)
+      allow(File).to receive(:exist?).with(dist_file).and_return(dist)
+
+      allow(File).to receive(:read).with(target_file).and_return(target)
+      allow(File).to receive(:read).with(dist_file).and_return(dist)
+
+      file = double(File)
+      allow(File).to receive(:open).with(target_file, 'w').and_yield(file)
+      allow(file).to receive(:write) { |str| written << str }
+    end
+
+    def run
+      subject.update_local_configuration([file])
+    end
+
+    def updated_config
+      expect(written).not_to be_empty
+      YAML.load(written.join)
+    end
+
+    context 'when the target does not exist' do
+      it 'creates the target' do
+        run
+        expect(updated_config).to eq('a' => 1, 'b' => 2)
+      end
+    end
+
+    context 'when the target is missing an option' do
+      let(:target) { YAML.dump('a' => 2) }
+
+      it 'merges the new configuration option' do
+        run
+        expect(updated_config).to eq('a' => 2, 'b' => 2)
+      end
+    end
+
+    context 'when the target has an extra option' do
+      let(:target) { YAML.dump('a' => 2, 'b' => 2, 'c' => 3) }
+
+      it 'retains the extra option' do
+        run
+        expect(updated_config).to eq('a' => 2, 'b' => 2, 'c' => 3)
+      end
+    end
+
+    context 'when a deeply nested option is added' do
+      let(:dist) { YAML.dump('a' => 1, 'b' => { 'd' => 3, 'e' => 4 }) }
+      let(:target) { YAML.dump('a' => 14, 'b' => { 'd' => 30 }) }
+
+      it 'merges the new configuration option' do
+        run
+        expect(updated_config).to eq('a' => 14, 'b' => { 'd' => 30, 'e' => 4 })
+      end
+    end
+
+    context 'when a deeply nested option is removed' do
+      let(:dist) { YAML.dump('a' => 1, 'b' => { 'd' => 3 }) }
+      let(:target) { YAML.dump('a' => 14, 'b' => { 'd' => 30, 'e' => 4 }) }
+
+      it 'retains the option' do
+        run
+        expect(updated_config).to eq('a' => 14, 'b' => { 'd' => 30, 'e' => 4 })
+      end
+    end
+
+    context 'when the filename is not "*.yml"' do
+      let(:file) { 'a.txt' }
+
+      it 'raises an error' do
+        expect { run }.to raise_error(/Not a \.yml file/)
+      end
+    end
+
+    context 'when the dist file is missing' do
+      let(:dist) { nil }
+
+      it 'raises an error' do
+        expect { run }.to raise_error(/Missing dist config file/)
+      end
+    end
+  end
 end
