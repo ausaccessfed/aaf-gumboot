@@ -44,8 +44,8 @@ module API
 
       x509_dn_hash['CN'] || fail(Unauthorized, 'Subject CN invalid')
 
-      rescue OpenSSL::X509::NameError
-        raise(Unauthorized, 'Subject DN invalid')
+    rescue OpenSSL::X509::NameError
+      raise(Unauthorized, 'Subject DN invalid')
     end
 
     def check_access!(action)
