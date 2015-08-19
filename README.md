@@ -566,7 +566,7 @@ require 'api_constraints'
 <Your Application>::Application.routes.draw do
 
   namespace :api, defaults: { format: 'json' } do
-    scope module: :v1, constraints: APIConstraints.new(version: 1, default: true) do
+    scope constraints: APIConstraints.new(version: 1, default: true) do
       resources :xyz, param: :uid, only: [:show, :create, :update, :destroy]
     end
   end
