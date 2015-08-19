@@ -577,18 +577,17 @@ This method has controllers living within the API::VX module and naturally exten
 
 ##### RSpec shared examples
 ``` ruby
-require 'spec_helper'
-
+require 'rails_helper'
 require 'gumboot/shared_examples/api_constraints'
-
-require 'api_constraints'
 
 RSpec.describe APIConstraints do
   let(:matching_request) do
-    double(headers: { 'Accept' => 'application/vnd.aaf.<your application name>.v1+json' })
+    headers = { 'Accept' => 'application/vnd.aaf.<your application name>.v1+json' }
+    instance_double(ActionDispatch::Request, headers: headers)
   end
   let(:non_matching_request) do
-    double(headers: { 'Accept' => 'application/vnd.aaf.<your application name>.v2+json' })
+    headers = { 'Accept' => 'application/vnd.aaf.<your application name>.v2+json' }
+    instance_double(ActionDispatch::Request, headers: headers)
   end
 
   include_examples 'API constraints'
