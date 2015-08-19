@@ -44,31 +44,39 @@ limitations under the License.
 The way we build ruby applications has tried to be standardised as much as possible at a base layer. You're likely going to want all these Gems in your Gemfile for a Rails app or a considerable subset of them for a non Rails app.
 
 ```ruby
-gem 'rails', '4.1.8' # Ensure latest release
+gem 'rails', '4.2.3' # Ensure latest release
 gem 'mysql2'
 
-gem 'aaf-lipstick'
+gem 'rapid-rack'
+gem 'valhammer'
 gem 'accession'
-gem 'thumper'
+gem 'aaf-lipstick'
 
 gem 'unicorn', require: false
+gem 'god', require: false
 
 group :development, :test do
-  gem 'rspec-rails', '~> 3.1.0'
+  gem 'rspec-rails', '~> 3.3.0'
   gem 'shoulda-matchers'
 
   gem 'factory_girl_rails'
   gem 'faker'
+  gem 'timecop'
+  gem 'database_cleaner'
 
   gem 'rubocop', require: false
   gem 'simplecov', require: false
-  gem 'coveralls'
+
+  gem 'capybara', require: false
+  gem 'poltergeist', require: false
+  gem 'phantomjs', require: 'phantomjs/poltergeist'
 
   gem 'guard', require: false
   gem 'guard-bundler', require: false
   gem 'guard-rubocop', require: false
   gem 'guard-rspec', require: false
   gem 'guard-brakeman', require: false
+  gem 'terminal-notifier-guard', require: false
 
   gem 'aaf-gumboot'
 end
