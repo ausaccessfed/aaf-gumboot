@@ -117,9 +117,7 @@ class Subject < ActiveRecord::Base
   has_many :subject_roles
   has_many :roles, through: :subject_roles
 
-  validates :name, :mail, presence: true
-  validates :targeted_id, :shared_token, presence: true, if: :complete?
-  validates :enabled, :complete, inclusion: [true, false]
+  valhammer
 
   def permissions
     # This could be extended to gather permissions from
@@ -187,9 +185,7 @@ module API
     has_many :api_subject_roles
     has_many :roles, through: :api_subject_roles
 
-    validates :x509_cn, presence: true
-    validates :contact_name, :contact_mail, :description, presence: true
-    validates :enabled, inclusion: [true, false]
+    valhammer
 
     def permissions
       # This could be extended to gather permissions from
@@ -262,7 +258,7 @@ class Role < ActiveRecord::Base
 
   has_many :permissions
 
-  validates :name, presence: true
+  valhammer
 end
 ```
 
@@ -301,9 +297,10 @@ Permissions are the lowest level constructs in security policies. They describe 
 ``` ruby
 class Permission < ActiveRecord::Base
   belongs_to :role
-  validates :value, presence: true, uniqueness: { scope: :role },
-                    format: Accession::Permission.regexp
-  validates :role, presence: true
+
+  valhammer
+
+  validates :value, format: Accession::Permission.regexp
 end
 ```
 
