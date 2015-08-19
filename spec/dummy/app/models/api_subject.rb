@@ -1,14 +1,16 @@
-class Subject < ActiveRecord::Base
+require 'accession'
+
+class APISubject < ActiveRecord::Base
   include Accession::Principal
 
-  has_many :subject_roles
-  has_many :roles, through: :subject_roles
+  has_many :api_subject_roles
+  has_many :roles, through: :api_subject_roles
 
   valhammer
 
   def permissions
     # This could be extended to gather permissions from
-    # other data sources providing input to subject identity
+    # other data sources providing input to api_subject identity
     roles.flat_map { |role| role.permissions.map(&:value) }
   end
 
