@@ -174,59 +174,52 @@ end
 #### API Subject
 An API Subject is an extension of the Subject concept reserved specifically for Subjects that utilise x509 client certificate verification to make requests to the applications RESTful API endpoints.
 
-Having this model live within the API module is recommended.
-
 ##### Active Model
 ``` ruby
-module API
-  class APISubject < ActiveRecord::Base
-    include Accession::Principal
+class APISubject < ActiveRecord::Base
+  include Accession::Principal
 
-    has_many :api_subject_roles
-    has_many :roles, through: :api_subject_roles
+  has_many :api_subject_roles
+  has_many :roles, through: :api_subject_roles
 
-    valhammer
+  valhammer
 
-    def permissions
-      # This could be extended to gather permissions from
-      # other data sources providing input to api_subject identity
-      roles.flat_map { |role| role.permissions.map(&:value) }
-    end
+  def permissions
+    # This could be extended to gather permissions from
+    # other data sources providing input to api_subject identity
+    roles.flat_map { |role| role.permissions.map(&:value) }
+  end
 
-    def functioning?
-      # more than enabled? could inform functioning?
-      # such as an administrative or AAF lock
-      enabled?
-    end
+  def functioning?
+    # more than enabled? could inform functioning?
+    # such as an administrative or AAF lock
+    enabled?
   end
 end
-
 ```
 
 ##### Sequel
 ``` ruby
-module API
-  class APISubject < Sequel::Model
-    include Accession::Principal
+class APISubject < Sequel::Model
+  include Accession::Principal
 
-    many_to_many :roles, class: 'Role'
+  many_to_many :roles, class: 'Role'
 
-    def permissions
-      # This could be extended to gather permissions from
-      # other data sources providing input to api_subject identity
-      roles.flat_map { |role| role.permissions.map(&:value) }
-    end
+  def permissions
+    # This could be extended to gather permissions from
+    # other data sources providing input to api_subject identity
+    roles.flat_map { |role| role.permissions.map(&:value) }
+  end
 
-    def functioning?
-      # more than enabled? could inform functioning?
-      # such as an administrative or AAF lock
-      enabled?
-    end
+  def functioning?
+    # more than enabled? could inform functioning?
+    # such as an administrative or AAF lock
+    enabled?
+  end
 
-    def validate
-      validates_presence [:x509_cn, :description,
-                          :contact_name, :contact_mail, :enabled]
-    end
+  def validate
+    validates_presence [:x509_cn, :description,
+                        :contact_name, :contact_mail, :enabled]
   end
 end
 ```
@@ -237,7 +230,7 @@ require 'rails_helper'
 
 require 'gumboot/shared_examples/api_subjects'
 
-RSpec.describe API::APISubject, type: :model do
+RSpec.describe APISubject, type: :model do
   include_examples 'API Subjects'
 
   # TODO: examples for your model extensions here
@@ -250,7 +243,7 @@ The term *Role* is thrown around a lot and it's meaning is very diluted. For our
 ##### Active Record
 ``` ruby
 class Role < ActiveRecord::Base
-  has_many :api_subject_roles, class_name: 'API::APISubjectRole'
+  has_many :api_subject_roles
   has_many :api_subjects, through: :api_subject_roles
 
   has_many :subject_roles
@@ -267,7 +260,7 @@ end
 class Role < Sequel::Model
   one_to_many :permissions
 
-  many_to_many :api_subjects, class: 'API::APISubject'
+  many_to_many :api_subjects
   many_to_many :subjects
 
   def validate
