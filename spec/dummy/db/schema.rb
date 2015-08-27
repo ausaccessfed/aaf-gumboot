@@ -1,43 +1,45 @@
 ActiveRecord::Schema.define(version: 0) do
   create_table :roles do |t|
-    t.string :name
-    t.timestamps
+    t.string :name, null: false
+    t.timestamps null: false
   end
 
   create_table :permissions do |t|
-    t.string :value
-    t.belongs_to :role
-    t.timestamps
+    t.string :value, null: false
+    t.belongs_to :role, null: false
+    t.timestamps null: false
+
+    t.index [:role_id, :value], unique: true
   end
 
   create_table :api_subjects do |t|
-    t.string :x509_cn
-    t.string :contact_name
-    t.string :contact_mail
-    t.string :description
-    t.boolean :enabled
-    t.timestamps
+    t.string :x509_cn, null: false
+    t.string :contact_name, null: false
+    t.string :contact_mail, null: false
+    t.string :description, null: false
+    t.boolean :enabled, null: false
+    t.timestamps null: false
   end
 
   create_table :api_subject_roles do |t|
-    t.belongs_to :api_subject
-    t.belongs_to :role
-    t.timestamps
+    t.belongs_to :api_subject, null: false
+    t.belongs_to :role, null: false
+    t.timestamps null: false
   end
 
   create_table :subjects do |t|
-    t.string :name
-    t.string :mail
-    t.string :targeted_id
-    t.string :shared_token
-    t.boolean :enabled
-    t.boolean :complete
-    t.timestamps
+    t.string :name, null: false
+    t.string :mail, null: false
+    t.string :targeted_id, null: false
+    t.string :shared_token, null: false
+    t.boolean :enabled, null: false
+    t.boolean :complete, null: false
+    t.timestamps null: false
   end
 
   create_table :subject_roles do |t|
-    t.belongs_to :subject
-    t.belongs_to :role
-    t.timestamps
+    t.belongs_to :subject, null: false
+    t.belongs_to :role, null: false
+    t.timestamps null: false
   end
 end

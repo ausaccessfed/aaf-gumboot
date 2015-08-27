@@ -44,31 +44,39 @@ limitations under the License.
 The way we build ruby applications has tried to be standardised as much as possible at a base layer. You're likely going to want all these Gems in your Gemfile for a Rails app or a considerable subset of them for a non Rails app.
 
 ```ruby
-gem 'rails', '4.1.8' # Ensure latest release
+gem 'rails', '4.2.3' # Ensure latest release
 gem 'mysql2'
 
-gem 'aaf-lipstick'
+gem 'rapid-rack'
+gem 'valhammer'
 gem 'accession'
-gem 'thumper'
+gem 'aaf-lipstick'
 
 gem 'unicorn', require: false
+gem 'god', require: false
 
 group :development, :test do
-  gem 'rspec-rails', '~> 3.1.0'
+  gem 'rspec-rails', '~> 3.3.0'
   gem 'shoulda-matchers'
 
   gem 'factory_girl_rails'
   gem 'faker'
+  gem 'timecop'
+  gem 'database_cleaner'
 
   gem 'rubocop', require: false
   gem 'simplecov', require: false
-  gem 'coveralls'
+
+  gem 'capybara', require: false
+  gem 'poltergeist', require: false
+  gem 'phantomjs', require: 'phantomjs/poltergeist'
 
   gem 'guard', require: false
   gem 'guard-bundler', require: false
   gem 'guard-rubocop', require: false
   gem 'guard-rspec', require: false
   gem 'guard-brakeman', require: false
+  gem 'terminal-notifier-guard', require: false
 
   gem 'aaf-gumboot'
 end
@@ -109,9 +117,7 @@ class Subject < ActiveRecord::Base
   has_many :subject_roles
   has_many :roles, through: :subject_roles
 
-  validates :name, :mail, presence: true
-  validates :targeted_id, :shared_token, presence: true, if: :complete?
-  validates :enabled, :complete, inclusion: [true, false]
+  valhammer
 
   def permissions
     # This could be extended to gather permissions from
@@ -168,61 +174,52 @@ end
 #### API Subject
 An API Subject is an extension of the Subject concept reserved specifically for Subjects that utilise x509 client certificate verification to make requests to the applications RESTful API endpoints.
 
-Having this model live within the API module is recommended.
-
 ##### Active Model
 ``` ruby
-module API
-  class APISubject < ActiveRecord::Base
-    include Accession::Principal
+class APISubject < ActiveRecord::Base
+  include Accession::Principal
 
-    has_many :api_subject_roles
-    has_many :roles, through: :api_subject_roles
+  has_many :api_subject_roles
+  has_many :roles, through: :api_subject_roles
 
-    validates :x509_cn, presence: true
-    validates :contact_name, :contact_mail, :description, presence: true
-    validates :enabled, inclusion: [true, false]
+  valhammer
 
-    def permissions
-      # This could be extended to gather permissions from
-      # other data sources providing input to api_subject identity
-      roles.flat_map { |role| role.permissions.map(&:value) }
-    end
+  def permissions
+    # This could be extended to gather permissions from
+    # other data sources providing input to api_subject identity
+    roles.flat_map { |role| role.permissions.map(&:value) }
+  end
 
-    def functioning?
-      # more than enabled? could inform functioning?
-      # such as an administrative or AAF lock
-      enabled?
-    end
+  def functioning?
+    # more than enabled? could inform functioning?
+    # such as an administrative or AAF lock
+    enabled?
   end
 end
-
 ```
 
 ##### Sequel
 ``` ruby
-module API
-  class APISubject < Sequel::Model
-    include Accession::Principal
+class APISubject < Sequel::Model
+  include Accession::Principal
 
-    many_to_many :roles, class: 'Role'
+  many_to_many :roles, class: 'Role'
 
-    def permissions
-      # This could be extended to gather permissions from
-      # other data sources providing input to api_subject identity
-      roles.flat_map { |role| role.permissions.map(&:value) }
-    end
+  def permissions
+    # This could be extended to gather permissions from
+    # other data sources providing input to api_subject identity
+    roles.flat_map { |role| role.permissions.map(&:value) }
+  end
 
-    def functioning?
-      # more than enabled? could inform functioning?
-      # such as an administrative or AAF lock
-      enabled?
-    end
+  def functioning?
+    # more than enabled? could inform functioning?
+    # such as an administrative or AAF lock
+    enabled?
+  end
 
-    def validate
-      validates_presence [:x509_cn, :description,
-                          :contact_name, :contact_mail, :enabled]
-    end
+  def validate
+    validates_presence [:x509_cn, :description,
+                        :contact_name, :contact_mail, :enabled]
   end
 end
 ```
@@ -233,7 +230,7 @@ require 'rails_helper'
 
 require 'gumboot/shared_examples/api_subjects'
 
-RSpec.describe API::APISubject, type: :model do
+RSpec.describe APISubject, type: :model do
   include_examples 'API Subjects'
 
   # TODO: examples for your model extensions here
@@ -246,7 +243,7 @@ The term *Role* is thrown around a lot and it's meaning is very diluted. For our
 ##### Active Record
 ``` ruby
 class Role < ActiveRecord::Base
-  has_many :api_subject_roles, class_name: 'API::APISubjectRole'
+  has_many :api_subject_roles
   has_many :api_subjects, through: :api_subject_roles
 
   has_many :subject_roles
@@ -254,7 +251,7 @@ class Role < ActiveRecord::Base
 
   has_many :permissions
 
-  validates :name, presence: true
+  valhammer
 end
 ```
 
@@ -263,7 +260,7 @@ end
 class Role < Sequel::Model
   one_to_many :permissions
 
-  many_to_many :api_subjects, class: 'API::APISubject'
+  many_to_many :api_subjects
   many_to_many :subjects
 
   def validate
@@ -293,9 +290,10 @@ Permissions are the lowest level constructs in security policies. They describe 
 ``` ruby
 class Permission < ActiveRecord::Base
   belongs_to :role
-  validates :value, presence: true, uniqueness: { scope: :role },
-                    format: Accession::Permission.regexp
-  validates :role, presence: true
+
+  valhammer
+
+  validates :value, format: Accession::Permission.regexp
 end
 ```
 
@@ -568,7 +566,7 @@ require 'api_constraints'
 <Your Application>::Application.routes.draw do
 
   namespace :api, defaults: { format: 'json' } do
-    scope module: :v1, constraints: APIConstraints.new(version: 1, default: true) do
+    scope constraints: APIConstraints.new(version: 1, default: true) do
       resources :xyz, param: :uid, only: [:show, :create, :update, :destroy]
     end
   end
@@ -579,18 +577,17 @@ This method has controllers living within the API::VX module and naturally exten
 
 ##### RSpec shared examples
 ``` ruby
-require 'spec_helper'
-
+require 'rails_helper'
 require 'gumboot/shared_examples/api_constraints'
-
-require 'api_constraints'
 
 RSpec.describe APIConstraints do
   let(:matching_request) do
-    double(headers: { 'Accept' => 'application/vnd.aaf.<your application name>.v1+json' })
+    headers = { 'Accept' => 'application/vnd.aaf.<your application name>.v1+json' }
+    instance_double(ActionDispatch::Request, headers: headers)
   end
   let(:non_matching_request) do
-    double(headers: { 'Accept' => 'application/vnd.aaf.<your application name>.v2+json' })
+    headers = { 'Accept' => 'application/vnd.aaf.<your application name>.v2+json' }
+    instance_double(ActionDispatch::Request, headers: headers)
   end
 
   include_examples 'API constraints'

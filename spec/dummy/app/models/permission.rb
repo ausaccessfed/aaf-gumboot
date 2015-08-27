@@ -1,6 +1,7 @@
 class Permission < ActiveRecord::Base
   belongs_to :role
-  validates :value, presence: true, uniqueness: { scope: :role },
-                    format: Accession::Permission.regexp
-  validates :role, presence: true
+
+  valhammer
+
+  validates :value, format: Accession::Permission.regexp
 end

@@ -8,13 +8,11 @@ require 'simplecov'
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../dummy/config/environment.rb', __FILE__)
 
+load Rails.root.join('db/schema.rb')
+
 FactoryGirl.find_definitions
 
 RSpec.configure do |config|
-  config.before(:suite) do
-    load Rails.root.join('db/schema.rb')
-  end
-
   config.around do |example|
     ActiveRecord::Base.transaction do
       example.run
