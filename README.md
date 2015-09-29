@@ -13,7 +13,7 @@
 
 [GV img]: https://img.shields.io/gem/v/aaf-gumboot.svg
 [BS img]: https://img.shields.io/codeship/9f557e20-0ccb-0133-b925-7aae0ba3591b/develop.svg
-[DS img]: https://img.shields.io/gemnasium/ausaccessfed/aaf-gumboot/develop.svg
+[DS img]: https://img.shields.io/gemnasium/ausaccessfed/aaf-gumboot.svg
 [CC img]: https://img.shields.io/codeclimate/github/ausaccessfed/aaf-gumboot.svg
 [CS img]: https://img.shields.io/codeclimate/coverage/github/ausaccessfed/aaf-gumboot.svg
 
