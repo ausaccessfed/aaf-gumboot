@@ -347,7 +347,7 @@ class ApplicationController < ActionController::Base
   after_action :ensure_access_checked
 
   def subject
-    subject = session[:subject_id] && Subject.find_by_id(session[:subject_id])
+    subject = session[:subject_id] && Subject.find_by(id: session[:subject_id])
     return nil unless subject.try(:functioning?)
     @subject = subject
   end
