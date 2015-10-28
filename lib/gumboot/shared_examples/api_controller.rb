@@ -33,6 +33,23 @@ RSpec.shared_examples 'API base controller' do
         end
       end
 
+      context 'x509 header set to "(null)"' do
+        before do
+          request.env['HTTP_X509_DN'] = '(null)'
+          get :an_action
+        end
+
+        it { is_expected.to have_http_status(:unauthorized) }
+        context 'json within response' do
+          it 'has a message' do
+            expect(json['message']).to eq('SSL client failure.')
+          end
+          it 'has an error' do
+            expect(json['error']).to eq('Subject DN')
+          end
+        end
+      end
+
       context 'invalid x509 header set by nginx' do
         before do
           request.env['HTTP_X509_DN'] = "Z=#{Faker::Lorem.word}"

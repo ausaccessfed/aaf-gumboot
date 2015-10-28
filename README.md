@@ -483,8 +483,7 @@ module API
     def x509_cn
       # Verified DN pushed by nginx following successful client SSL verification
       # nginx is always going to do a better job of terminating SSL then we can
-      x509_dn = request.headers['HTTP_X509_DN'].try(:force_encoding, 'UTF-8')
-      fail(Unauthorized, 'Subject DN') unless x509_dn
+      fail(Unauthorized, 'Subject DN') if x509_dn.nil?
 
       x509_dn_parsed = OpenSSL::X509::Name.parse(x509_dn)
       x509_dn_hash = Hash[x509_dn_parsed.to_a
@@ -492,8 +491,13 @@ module API
 
       x509_dn_hash['CN'] || fail(Unauthorized, 'Subject CN invalid')
 
-      rescue OpenSSL::X509::NameError
-        raise(Unauthorized, 'Subject DN invalid')
+    rescue OpenSSL::X509::NameError
+      raise(Unauthorized, 'Subject DN invalid')
+    end
+
+    def x509_dn
+      x509_dn = request.headers['HTTP_X509_DN'].try(:force_encoding, 'UTF-8')
+      x509_dn == '(null)' ? nil : x509_dn
     end
 
     def check_access!(action)
@@ -517,7 +521,6 @@ module API
     end
   end
 end
-
 ```
 
 ##### RSpec shared examples
