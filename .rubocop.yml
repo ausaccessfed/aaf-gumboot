@@ -8,3 +8,4 @@ Style/FileName:
 AllCops:
   Exclude:
     - Guardfile
+  TargetRubyVersion: 2.1
