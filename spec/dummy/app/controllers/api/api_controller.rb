@@ -38,8 +38,11 @@ module API
       raise(Unauthorized, 'Subject DN') if x509_dn.nil?
 
       x509_dn_parsed = OpenSSL::X509::Name.parse(x509_dn)
-      x509_dn_hash = Hash[x509_dn_parsed.to_a
-                          .map { |components| components[0..1] }]
+      x509_dn_hash = Hash[
+        x509_dn_parsed.to_a.map do |components|
+          components[0..1]
+        end
+      ]
 
       x509_dn_hash['CN'] || raise(Unauthorized, 'Subject CN invalid')
 
