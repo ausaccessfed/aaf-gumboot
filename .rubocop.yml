@@ -6,5 +6,4 @@ Style/FileName:
     - lib/aaf-gumboot.rb
 
 AllCops:
-  Exclude:
-    - Guardfile
+  TargetRubyVersion: 2.1

@@ -23,7 +23,7 @@ module Gumboot
 
     def ensure_database(db)
       adapter, database = db.values_at(*%w(adapter database))
-      fail('Only supports mysql2 adapter') unless adapter == 'mysql2'
+      raise('Only supports mysql2 adapter') unless adapter == 'mysql2'
 
       puts "Ensuring database `#{database}` exists"
       client.query("CREATE DATABASE IF NOT EXISTS `#{database}`")
@@ -33,7 +33,7 @@ module Gumboot
       adapter, database, username, password =
         db.values_at(*%w(adapter database username password))
 
-      fail('Only supports mysql2 adapter') unless adapter == 'mysql2'
+      raise('Only supports mysql2 adapter') unless adapter == 'mysql2'
 
       puts "Ensuring access to `#{database}` for #{username} user is granted"
       client.query("GRANT ALL PRIVILEGES ON `#{database}`.* " \
@@ -66,7 +66,7 @@ module Gumboot
     def link_global_configuration(files)
       files.each do |file|
         src = File.expand_path("~/.aaf/#{file}")
-        fail("Missing global config file: #{src}") unless File.exist?(src)
+        raise("Missing global config file: #{src}") unless File.exist?(src)
 
         dest =  "config/#{file}"
         next if File.exist?(dest)
@@ -77,8 +77,8 @@ module Gumboot
     def update_local_configuration(files)
       files.each do |file|
         src = "config/#{file}.dist"
-        fail("Not a .yml file: #{file}") unless file.end_with?('.yml')
-        fail("Missing dist config file: #{src}") unless File.exist?(src)
+        raise("Not a .yml file: #{file}") unless file.end_with?('.yml')
+        raise("Missing dist config file: #{src}") unless File.exist?(src)
 
         merge_config(src, "config/#{file}")
       end
