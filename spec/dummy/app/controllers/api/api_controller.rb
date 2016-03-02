@@ -65,7 +65,7 @@ module API
     end
 
     def unauthorized(exception)
-      message = 'SSL client raiseure.'
+      message = 'SSL client failure.'
       error = exception.message
       render json: { message: message, error: error }, status: :unauthorized
     end
