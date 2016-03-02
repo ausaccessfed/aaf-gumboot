@@ -160,7 +160,7 @@ end
 
 ##### RSpec shared examples
 ```ruby
-require 'spec_helper'
+require 'rails_helper'
 
 require 'gumboot/shared_examples/subjects'
 
@@ -391,7 +391,7 @@ end
 
 ##### RSpec shared examples
 ``` ruby
-require 'spec_helper'
+require 'rails_helper'
 
 require 'gumboot/shared_examples/application_controller'
 
