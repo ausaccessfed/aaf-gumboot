@@ -97,6 +97,26 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
 end
 ```
 
+### Database Schema
+
+Before creating any migrations, add the RSpec shared examples which ensure your
+database schema will behave in the way we expect:
+
+**Note:** This is only applicable to applications using MySQL / MariaDB.
+
+```ruby
+# spec/models/schema_spec.rb
+
+require 'rails_helper'
+require 'gumboot/shared_examples/database_schema'
+
+RSpec.describe 'Database Schema' do
+  let(:connection) { ActiveRecord::Base.connection.raw_connection }
+
+  include_context 'Database Schema'
+end
+```
+
 ### Models
 All AAF applications **must** provide the following models.
 
