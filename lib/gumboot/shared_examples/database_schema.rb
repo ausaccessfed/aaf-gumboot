@@ -11,6 +11,10 @@ RSpec.shared_examples 'Database Schema' do
 
     before { expect(connection).to be_a(Mysql2::Client) }
 
+    it 'has the correct encoding set for the connection' do
+      expect(connection.query_options).to include(encoding: 'utf8')
+    end
+
     it 'has the correct collation set for the connection' do
       expect(connection.query_options).to include(collation: 'utf8_bin')
     end
