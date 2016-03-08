@@ -4,8 +4,13 @@ RSpec.shared_examples 'Database Schema' do
       match { |actual| actual[:Collation] == expected }
 
       failure_message do |actual|
-        format('expected table `%<Name>s` to use collation `%<expected>s`, ' \
-               'but was `%<Collation>s`', actual.merge(expected: expected))
+        if actual[:Field]
+          format('expected field `%<Field>s` to use collation `%<expected>s`,' \
+                 ' but was `%<Collation>s`', actual.merge(expected: expected))
+        else
+          format('expected table `%<Name>s` to use collation `%<expected>s`, ' \
+                 'but was `%<Collation>s`', actual.merge(expected: expected))
+        end
       end
     end
 
@@ -20,11 +25,18 @@ RSpec.shared_examples 'Database Schema' do
     end
 
     it 'has the correct collation' do
-      result = connection.query('SHOW TABLE STATUS',
+      tables = connection.query('SHOW TABLE STATUS',
                                 as: :hash, symbolize_keys: true)
-      result.each do |table|
+      tables.each do |table|
         next if table[:Name] == 'schema_migrations'
         expect(table).to have_collation('utf8_bin')
+
+        columns = connection.query("SHOW FULL COLUMNS FROM #{table[:Name]}",
+                                   as: :hash, symbolize_keys: true)
+        columns.each do |column|
+          next unless column[:Collation]
+          expect(column).to have_collation('utf8_bin')
+        end
       end
     end
   end
