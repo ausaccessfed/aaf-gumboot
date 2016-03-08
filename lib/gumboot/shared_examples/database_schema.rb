@@ -11,6 +11,10 @@ RSpec.shared_examples 'Database Schema' do
 
     before { expect(connection).to be_a(Mysql2::Client) }
 
+    it 'has the correct collation set for the connection' do
+      expect(connection.query_options).to include(collation: 'utf8_bin')
+    end
+
     it 'has the correct collation' do
       result = connection.query('SHOW TABLE STATUS',
                                 as: :hash, symbolize_keys: true)
