@@ -16,6 +16,10 @@ RSpec.shared_examples 'Database Schema' do
 
     before { expect(connection).to be_a(Mysql2::Client) }
 
+    def query(sql)
+      connection.query(sql, as: :hash, symbolize_keys: true)
+    end
+
     it 'has the correct encoding set for the connection' do
       expect(connection.query_options).to include(encoding: 'utf8')
     end
@@ -25,15 +29,11 @@ RSpec.shared_examples 'Database Schema' do
     end
 
     it 'has the correct collation' do
-      tables = connection.query('SHOW TABLE STATUS',
-                                as: :hash, symbolize_keys: true)
-      tables.each do |table|
+      query('SHOW TABLE STATUS').each do |table|
         next if table[:Name] == 'schema_migrations'
         expect(table).to have_collation('utf8_bin')
 
-        columns = connection.query("SHOW FULL COLUMNS FROM #{table[:Name]}",
-                                   as: :hash, symbolize_keys: true)
-        columns.each do |column|
+        query("SHOW FULL COLUMNS FROM #{table[:Name]}").each do |column|
           next unless column[:Collation]
           expect(column).to have_collation('utf8_bin')
         end
