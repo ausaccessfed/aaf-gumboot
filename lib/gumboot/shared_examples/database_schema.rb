@@ -15,6 +15,7 @@ RSpec.shared_examples 'Database Schema' do
       result = connection.query('SHOW TABLE STATUS',
                                 as: :hash, symbolize_keys: true)
       result.each do |table|
+        next if table[:Name] == 'schema_migrations'
         expect(table).to have_collation('utf8_bin')
       end
     end
