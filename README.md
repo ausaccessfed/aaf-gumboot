@@ -99,10 +99,22 @@ end
 
 ### Database Schema
 
-Before creating any migrations, add the RSpec shared examples which ensure your
-database schema will behave in the way we expect:
-
 **Note:** This is only applicable to applications using MySQL / MariaDB.
+
+Ensure your database connection is using the `utf8` character set, and
+`utf8_bin` collation. In Rails applications, this is set in
+`config/database.yml`:
+
+```yaml
+default: &default
+  adapter: mysql2
+  encoding: utf8
+  collation: utf8_bin
+  # ... etc
+```
+
+Before creating any migrations, add the RSpec shared examples which validate the
+encoding and collation of your schema:
 
 ```ruby
 # spec/models/schema_spec.rb
@@ -116,6 +128,26 @@ RSpec.describe 'Database Schema' do
   include_context 'Database Schema'
 end
 ```
+
+For any existing app which adopts this set of tests, it is not sufficient to
+change the configuration and run all migrations again on a clean database. All
+tables which predate the configuration change MUST have a migration created
+which alters their collation (to ensure test / production environments have the
+correct database schema). This can be done per table as follows:
+
+```ruby
+class ChangeTableCollationToBinary < ActiveRecord::Migration
+  def change
+    execute('ALTER TABLE my_objects COLLATE = utf8_bin')
+    execute('ALTER TABLE my_objects CONVERT TO CHARACTER SET utf8 ' \
+            'COLLATE utf8_bin')
+  end
+end
+```
+
+The change in collation will not be reflected in `db/schema.rb`, but will still
+be applied correctly during `rake db:schema:load` due to the connection
+settings.
 
 ### Models
 All AAF applications **must** provide the following models.
