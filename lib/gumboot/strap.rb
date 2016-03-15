@@ -84,6 +84,18 @@ module Gumboot
       end
     end
 
+    def install_dist_template(files)
+      files.each do |file|
+        src = "config/#{file}.dist"
+        dest = "config/#{file}"
+
+        raise("Missing dist config file: #{src}") unless File.exist?(src)
+
+        next if File.exist?(dest)
+        FileUtils.copy(src, dest)
+      end
+    end
+
     private
 
     def message(msg)

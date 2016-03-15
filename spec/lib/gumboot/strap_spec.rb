@@ -283,4 +283,40 @@ RSpec.describe Gumboot::Strap do
       end
     end
   end
+
+  describe '#install_dist_template' do
+    let(:filename) { Faker::Lorem.words(2).join('.') }
+    let(:src) { "config/#{filename}.dist" }
+    let(:dest) { "config/#{filename}" }
+
+    def run
+      subject.install_dist_template([filename])
+    end
+
+    before do
+      allow(File).to receive(:exist?).with(src).and_return(true)
+    end
+
+    context 'when the target file exists' do
+      before do
+        allow(File).to receive(:exist?).with(dest).and_return(true)
+      end
+
+      it 'does not copy the file' do
+        expect(FileUtils).not_to receive(:copy)
+        run
+      end
+    end
+
+    context 'when the target file does not exist' do
+      before do
+        allow(File).to receive(:exist?).with(dest).and_return(false)
+      end
+
+      it 'copies the file' do
+        expect(FileUtils).to receive(:copy).with(src, dest)
+        run
+      end
+    end
+  end
 end
