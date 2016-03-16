@@ -113,8 +113,19 @@ default: &default
   # ... etc
 ```
 
-Before creating any migrations, add the RSpec shared examples which validate the
-encoding and collation of your schema:
+Create a migration which ensures the correct setting is applied at the database
+level:
+
+```ruby
+class ChangeDatabaseCollationToBinary < ActiveRecord::Migration
+  def change
+    execute('ALTER DATABASE COLLATE = utf8_bin')
+  end
+end
+```
+
+Before creating any further migrations, add the RSpec shared examples which
+validate the encoding and collation of your schema:
 
 ```ruby
 # spec/models/schema_spec.rb
@@ -146,8 +157,32 @@ end
 ```
 
 The change in collation will not be reflected in `db/schema.rb`, but will still
-be applied correctly during `rake db:schema:load` due to the connection
-settings.
+be applied correctly during `rake db:schema:load` due to the new database
+collation setting.
+
+#### Continuous Integration environments
+
+An often-seen pattern on CI servers is to use a database which was created
+out-of-band before permissions were granted to access the database. This very
+rarely results in the correct collation setting for the database.
+
+There are two ways we can address this easily:
+
+1.  Drop and create the database again before loading the schema or running
+    migrations. For example:
+
+    ```
+    bundle exec rake db:drop db:create db:schema:load
+    ```
+
+2.  Alter the collation of the database using the `mysql` command line client
+    (ensure to alter both the `test` and `development` databases when using this
+    method). For example:
+
+    ```
+    mysql -e 'ALTER DATABASE COLLATE = utf8_bin' my_app_development
+    mysql -e 'ALTER DATABASE COLLATE = utf8_bin' my_app_test
+    ```
 
 ### Models
 All AAF applications **must** provide the following models.
