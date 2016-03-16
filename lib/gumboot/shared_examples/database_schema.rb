@@ -24,6 +24,10 @@ RSpec.shared_examples 'Database Schema' do
     end
 
     it 'has the correct collation' do
+      db_collation = query('SHOW VARIABLES LIKE "collation_database"')
+                     .first[:Value]
+      expect(db_collation).to eq('utf8_bin')
+
       query('SHOW TABLE STATUS').each do |table|
         table_name = table[:Name]
         next if table_name == 'schema_migrations'
