@@ -184,6 +184,11 @@ There are two ways we can address this easily:
     mysql -e 'ALTER DATABASE COLLATE = utf8_bin' my_app_test
     ```
 
+Also note that some CI platforms will automatically set your
+`config/database.yml` (thus **overwriting your collation settings**).
+For Codeship refer to [https://codeship.com/documentation/databases/](https://codeship.com/documentation/databases/) to configure your database
+correctly.
+
 ### Models
 All AAF applications **must** provide the following models.
 
