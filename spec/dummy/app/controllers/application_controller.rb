@@ -25,8 +25,6 @@ class ApplicationController < ActionController::Base
     @subject = Subject.find_by(id: session[:subject_id])
     raise(Unauthorized, 'Subject invalid') unless @subject
     raise(Unauthorized, 'Subject not functional') unless @subject.functioning?
-
-    redirect_to(url) unless return_url.blank?
   end
 
   def ensure_access_checked
@@ -58,11 +56,5 @@ class ApplicationController < ActionController::Base
     session[:return_url] = request.url if request.get?
 
     redirect_to('/auth/login')
-  end
-
-  def return_url
-    url = session[:return_url].to_s
-    session.delete(:return_url)
-    url
   end
 end
