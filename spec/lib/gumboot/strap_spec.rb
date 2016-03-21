@@ -28,7 +28,9 @@ RSpec.describe Gumboot::Strap do
     opts = {
       default_file: "#{ENV['HOME']}/.my.cnf",
       default_group: 'client',
-      host: '127.0.0.1'
+      host: '127.0.0.1',
+      encoding: 'utf8',
+      collation: 'utf8_bin'
     }
 
     allow(Mysql2::Client).to receive(:new).with(opts).and_return(client)

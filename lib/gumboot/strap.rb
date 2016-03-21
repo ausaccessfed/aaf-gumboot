@@ -7,7 +7,9 @@ module Gumboot
       file = File.expand_path('~/.my.cnf')
       @client ||= Mysql2::Client.new(default_file: file,
                                      default_group: 'client',
-                                     host: '127.0.0.1')
+                                     host: '127.0.0.1',
+                                     encoding: 'utf8',
+                                     collation: 'utf8_bin')
     end
 
     def ensure_activerecord_databases(environments)
