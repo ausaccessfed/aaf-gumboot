@@ -100,6 +100,30 @@ RSpec.shared_examples 'Application controller' do
           expect(session[:subject_id]).to be_nil
         end
       end
+
+      context 'when request is session' do
+        it 'POST request should not create a uri session' do
+          post :an_action
+          expect(session).not_to include(:return_url)
+        end
+
+        it 'GET request should not create a uri session' do
+          get :an_action
+          uri = URI.parse(session[:return_url])
+          expect(uri.path).to eq('/anonymous/an_action')
+          expect(uri.query).to be_blank
+          expect(uri.fragment).to be_blank
+        end
+
+        it 'GET request should create a uri session including fragments' do
+          get :an_action, time: 1000
+          uri = URI.parse(session[:return_url])
+
+          expect(uri.path).to eq('/anonymous/an_action')
+          expect(uri.query).to eq('time=1000')
+          expect(uri.fragment).to be_blank
+        end
+      end
     end
 
     context '#ensure_access_checked as after_action' do

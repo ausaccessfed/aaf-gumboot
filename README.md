@@ -447,7 +447,7 @@ class ApplicationController < ActionController::Base
   protected
 
   def ensure_authenticated
-    return redirect_to('/auth/login') unless session[:subject_id]
+    return force_authentication unless session[:subject_id]
 
     @subject = Subject.find_by(id: session[:subject_id])
     raise(Unauthorized, 'Subject invalid') unless @subject
@@ -477,6 +477,12 @@ class ApplicationController < ActionController::Base
 
   def forbidden
     render 'errors/forbidden', status: :forbidden
+  end
+
+  def force_authentication
+    session[:return_url] = request.url if request.get?
+
+    redirect_to('/auth/login')
   end
 end
 ```
