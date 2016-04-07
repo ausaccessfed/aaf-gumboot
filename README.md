@@ -97,24 +97,64 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
 end
 ```
 
-### Database Schema
+## Database
+
+### Configuration
 
 **Note:** This is only applicable to applications using MySQL / MariaDB.
 
-Ensure your database connection is using the `utf8` character set, and
-`utf8_bin` collation. In Rails applications, this is set in
-`config/database.yml`:
+We use the following conventions for naming around databases:
+
+Username: `xyz_app` - where xyz represents the name of your application. In most
+cases this will be xyz-service, you should drop the `-service`.
+
+e.g. For bigboot-service, you'd use `bigboot_app`
+
+Database name: `xyz_#{env}` - where xyz represents the name of your application. 
+In most cases this will be xyz-service, you should drop the `-service`.
+
+e.g. For bigboot-service, you'd use `bigboot_development` for development.
+
+### Example Configuration
+
+The following example should form the basis of project database configuration.
+It is ready to be used for local development/test, for codeship CI and with AAF
+production defaults.
 
 ```yaml
 default: &default
   adapter: mysql2
+  username: example_app
+  password: password
+  host: 127.0.0.1
+  pool: 5
+  timeout: 5000
   encoding: utf8
   collation: utf8_bin
-  # ... etc
+
+development:
+  <<: *default
+  database: example_development
+
+test:
+  <<: *default
+  database: example_test
+
+production:
+  <<: *default
+  username: <%= ENV['EXAMPLE_DB_USERNAME'] %>
+  password: <%= ENV['EXAMPLE_DB_PASSWORD'] %>
+  database: <%= ENV['EXAMPLE_DB_NAME'] %>
 ```
 
-Create a migration which ensures the correct setting is applied at the database
-level:
+### UTF8 and binary collation
+
+The example config above will ensure your database connection is using 
+the `utf8` character set, and `utf8_bin` collation which is required for all
+AAF applications. 
+
+However you *MUST* also create a migration which ensures the correct setting 
+is applied at the database level:
 
 ```ruby
 class ChangeDatabaseCollationToBinary < ActiveRecord::Migration
@@ -140,6 +180,8 @@ RSpec.describe 'Database Schema' do
 end
 ```
 
+#### Existing Applications
+
 For any existing app which adopts this set of tests, it is not sufficient to
 change the configuration and run all migrations again on a clean database. All
 tables which predate the configuration change MUST have a migration created
@@ -160,7 +202,7 @@ The change in collation will not be reflected in `db/schema.rb`, but will still
 be applied correctly during `rake db:schema:load` due to the new database
 collation setting.
 
-#### Continuous Integration environments
+### Continuous Integration environments
 
 An often-seen pattern on CI servers is to use a database which was created
 out-of-band before permissions were granted to access the database. This very
