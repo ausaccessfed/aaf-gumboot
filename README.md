@@ -128,7 +128,6 @@ default: &default
   password: password
   host: 127.0.0.1
   pool: 5
-  timeout: 5000
   encoding: utf8
   collation: utf8_bin
 
