@@ -538,7 +538,7 @@ To ensure all AAF API work the same a base controller for all API related contro
 
 Having this controller live within an API module is recommended.
 
-##### Contollers
+##### Controllers
 
 ###### Rails 4.x
 See `spec/dummy/app/controllers/api/api_controller.rb` for the implementation this example is based on
