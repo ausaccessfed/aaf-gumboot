@@ -97,24 +97,63 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
 end
 ```
 
-### Database Schema
+## Database
+
+### Configuration
 
 **Note:** This is only applicable to applications using MySQL / MariaDB.
 
-Ensure your database connection is using the `utf8` character set, and
-`utf8_bin` collation. In Rails applications, this is set in
-`config/database.yml`:
+We use the following conventions for naming around databases:
+
+Username: `xyz_app` - where xyz represents the name of your application. In most
+cases this will be xyz-service, you should drop the `-service`.
+
+e.g. For bigboot-service, you'd use `bigboot_app`
+
+Database name: `xyz_#{env}` - where xyz represents the name of your application. 
+In most cases this will be xyz-service, you should drop the `-service`.
+
+e.g. For bigboot-service, you'd use `bigboot_development` for development.
+
+### Example Configuration
+
+The following example should form the basis of project database configuration.
+It is ready to be used for local development/test, for codeship CI and with AAF
+production defaults.
 
 ```yaml
 default: &default
   adapter: mysql2
+  username: example_app
+  password: password
+  host: 127.0.0.1
+  pool: 5
   encoding: utf8
   collation: utf8_bin
-  # ... etc
+
+development:
+  <<: *default
+  database: example_development
+
+test:
+  <<: *default
+  database: example_test
+
+production:
+  <<: *default
+  username: <%= ENV['EXAMPLE_DB_USERNAME'] %>
+  password: <%= ENV['EXAMPLE_DB_PASSWORD'] %>
+  database: <%= ENV['EXAMPLE_DB_NAME'] %>
 ```
 
-Create a migration which ensures the correct setting is applied at the database
-level:
+### UTF8 and binary collation
+
+The example config above will ensure your database connection is using 
+the `utf8` character set, and `utf8_bin` collation which is required for all
+AAF applications. 
+
+However you *MUST* also create a migration which ensures the correct setting 
+is applied at the database level:
 
 ```ruby
 class ChangeDatabaseCollationToBinary < ActiveRecord::Migration
@@ -140,6 +179,8 @@ RSpec.describe 'Database Schema' do
 end
 ```
 
+#### Existing Applications
+
 For any existing app which adopts this set of tests, it is not sufficient to
 change the configuration and run all migrations again on a clean database. All
 tables which predate the configuration change MUST have a migration created
@@ -160,7 +201,7 @@ The change in collation will not be reflected in `db/schema.rb`, but will still
 be applied correctly during `rake db:schema:load` due to the new database
 collation setting.
 
-#### Continuous Integration environments
+### Continuous Integration environments
 
 An often-seen pattern on CI servers is to use a database which was created
 out-of-band before permissions were granted to access the database. This very
@@ -189,7 +230,7 @@ Also note that some CI platforms will automatically set your
 For Codeship refer to [https://codeship.com/documentation/databases/](https://codeship.com/documentation/databases/) to configure your database
 correctly.
 
-### Models
+## Models
 All AAF applications **must** provide the following models.
 
 Example implementations are provided for ActiveModel and Sequel below. Developers may extend models or implement them in any way they wish.
@@ -198,10 +239,10 @@ For each model a FactoryGirl factory *must also be provided*.
 
 For each model the provided RSpec shared examples **must** be used within your application and **must** pass.
 
-#### Subject
+### Subject
 A Subject represents state and security operations for a single application user.
 
-##### Active Model
+#### Active Model
 ```ruby
 class Subject < ActiveRecord::Base
   include Accession::Principal
@@ -224,7 +265,7 @@ class Subject < ActiveRecord::Base
   end
 end
 ```
-##### Sequel
+#### Sequel
 ``` ruby
 class Subject < Sequel::Model
   include Accession::Principal
@@ -250,7 +291,7 @@ class Subject < Sequel::Model
 end
 ```
 
-##### RSpec shared examples
+#### RSpec shared examples
 ```ruby
 require 'rails_helper'
 
@@ -263,10 +304,10 @@ RSpec.describe Subject, type: :model do
 end
 ```
 
-#### API Subject
+### API Subject
 An API Subject is an extension of the Subject concept reserved specifically for Subjects that utilise x509 client certificate verification to make requests to the applications RESTful API endpoints.
 
-##### Active Model
+#### Active Model
 ``` ruby
 class APISubject < ActiveRecord::Base
   include Accession::Principal
@@ -290,7 +331,7 @@ class APISubject < ActiveRecord::Base
 end
 ```
 
-##### Sequel
+#### Sequel
 ``` ruby
 class APISubject < Sequel::Model
   include Accession::Principal
@@ -316,7 +357,7 @@ class APISubject < Sequel::Model
 end
 ```
 
-##### RSpec shared examples
+#### RSpec shared examples
 ```ruby
 require 'rails_helper'
 
@@ -329,10 +370,10 @@ RSpec.describe APISubject, type: :model do
 end
 ```
 
-#### Role
+### Role
 The term *Role* is thrown around a lot and it's meaning is very diluted. For our purposes a Role is really a collection of permissions and a collection of Subjects for whom each associated permission is applied.
 
-##### Active Record
+#### Active Record
 ``` ruby
 class Role < ActiveRecord::Base
   has_many :api_subject_roles
@@ -347,7 +388,7 @@ class Role < ActiveRecord::Base
 end
 ```
 
-##### Sequel
+#### Sequel
 ``` ruby
 class Role < Sequel::Model
   one_to_many :permissions
@@ -362,7 +403,7 @@ class Role < Sequel::Model
 end
 ```
 
-##### RSpec shared examples
+#### RSpec shared examples
 ```ruby
 require 'rails_helper'
 
@@ -375,10 +416,10 @@ RSpec.describe Role, type: :model do
 end
 ```
 
-#### Permission
+### Permission
 Permissions are the lowest level constructs in security policies. They describe which actions a Subject is able to perform or data the Subject is able to access.
 
-##### Active Record
+#### Active Record
 ``` ruby
 class Permission < ActiveRecord::Base
   belongs_to :role
@@ -389,7 +430,7 @@ class Permission < ActiveRecord::Base
 end
 ```
 
-##### Sequel
+#### Sequel
 ``` ruby
 class Permission < Sequel::Model
   many_to_one :role
@@ -401,7 +442,7 @@ class Permission < Sequel::Model
 end
 ```
 
-##### RSpec shared examples
+#### RSpec shared examples
 ```ruby
 require 'rails_helper'
 
@@ -414,14 +455,14 @@ RSpec.describe Permission, type: :model do
 end
 ```
 
-### Access Control
+## Access Control
 TODO
 
-### Controllers
+## Controllers
 
 AAF applications must utilise controllers which default to verifying authentication and access control on every request. This can be changed as implementations require to be publicly accessible for example but must be explicitly configured in code to make it clear to all.
 
-###### Rails 4.x
+##### Rails 4.x
 See `spec/dummy/app/controllers/application_controller.rb` for the implementation this example is based on
 
 ``` ruby
@@ -487,7 +528,7 @@ class ApplicationController < ActionController::Base
 end
 ```
 
-##### RSpec shared examples
+#### RSpec shared examples
 ``` ruby
 require 'rails_helper'
 
@@ -498,9 +539,9 @@ RSpec.describe ApplicationController, type: :controller do
 end
 ```
 
-### RESTful API
+## RESTful API
 
-#### Versioning
+### Versioning
 
 All AAF API **must** be versioned by default.
 
@@ -518,7 +559,7 @@ Accept: application/vnd.aaf.example.v1+json
 
 Change within an API version number will only be by extension, either with additional endpoints being made available or additional JSON being added to currently documented responses. Either of these changes should not impact well behaved clients that correctly parse and use JSON as intended. Clients should be advised of this expectation before receiving access.
 
-#### Client Errors
+### Client Errors
 
 There are three possible types of client errors on API calls that receive request bodies:
 
@@ -530,17 +571,17 @@ There are three possible types of client errors on API calls that receive reques
 
 Response errors will contain JSON with the 'message' or 'errors' values specified to give more visibility into what went wrong.
 
-#### Documenting resources
+### Documenting resources
 TODO.
 
-#### Responding to requests
+### Responding to requests
 To ensure all AAF API work the same a base controller for all API related controllers to extend from is recommended.
 
 Having this controller live within an API module is recommended.
 
-##### Controllers
+#### Controllers
 
-###### Rails 4.x
+##### Rails 4.x
 See `spec/dummy/app/controllers/api/api_controller.rb` for the implementation this example is based on
 
 ```ruby
@@ -621,7 +662,7 @@ module API
 end
 ```
 
-##### RSpec shared examples
+#### RSpec shared examples
 ``` ruby
 require 'rails_helper'
 
@@ -632,10 +673,10 @@ RSpec.describe API::APIController, type: :controller do
 end
 ```
 
-#### Routing requests
+### Routing requests
 Routing to the appropriate controller for handling API requests **must** be undertaken using content within the Accept header.
 
-##### Rails 4.x
+#### Rails 4.x
 Appropriate routing in a Rails 4.x application can be achieved as follows. Ensure you replace instances of *<your application name>* with something unique to the application i.e for the application named 'SAML service' we might use **`application/vnd.aaf.saml-service.v1+json`**
 
 `lib/api_constraints.rb`
@@ -676,7 +717,7 @@ end
 ```
 This method has controllers living within the API::VX module and naturally extending the APIController documented above.
 
-##### RSpec shared examples
+#### RSpec shared examples
 ``` ruby
 require 'rails_helper'
 require 'gumboot/shared_examples/api_constraints'
@@ -695,5 +736,5 @@ RSpec.describe APIConstraints do
 end
 ```
 
-## Event Handling
-TODO - Publishing and consuming events from AAF AMQP.
+# Event Handling
+TODO - Publishing and consuming events from AAF SQS.
