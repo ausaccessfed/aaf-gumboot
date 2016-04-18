@@ -19,6 +19,7 @@ ActiveRecord::Schema.define(version: 0) do
     t.string :description, null: false
     t.boolean :enabled, null: false
     t.timestamps null: false
+    t.index [:x509_cn], unique: true
   end
 
   create_table :api_subject_roles do |t|

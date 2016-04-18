@@ -13,6 +13,10 @@ RSpec.shared_examples 'API Subjects' do
       subject.x509_cn = nil
       expect(subject).not_to be_valid
     end
+    it 'is invalid if an x509 value is not unique' do
+      create(:api_subject, x509_cn: subject.x509_cn)
+      expect(subject).not_to be_valid
+    end
     it 'is invalid without a description' do
       subject.description = nil
       expect(subject).not_to be_valid
