@@ -316,6 +316,7 @@ class APISubject < ActiveRecord::Base
   has_many :roles, through: :api_subject_roles
 
   valhammer
+  validates :x509_cn, format: { with: /\A[\w-]+\z/ }
 
   def permissions
     # This could be extended to gather permissions from
@@ -353,6 +354,7 @@ class APISubject < Sequel::Model
   def validate
     validates_presence [:x509_cn, :description,
                         :contact_name, :contact_mail, :enabled]
+    validates_format /\A[\w-]+\z/, :x509_cn
   end
 end
 ```
