@@ -7,6 +7,7 @@ class APISubject < ActiveRecord::Base
   has_many :roles, through: :api_subject_roles
 
   valhammer
+  validates :x509_cn, format: { with: /\A[\w-]+\z/ }
 
   def permissions
     # This could be extended to gather permissions from

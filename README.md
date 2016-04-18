@@ -110,7 +110,7 @@ cases this will be xyz-service, you should drop the `-service`.
 
 e.g. For bigboot-service, you'd use `bigboot_app`
 
-Database name: `xyz_#{env}` - where xyz represents the name of your application. 
+Database name: `xyz_#{env}` - where xyz represents the name of your application.
 In most cases this will be xyz-service, you should drop the `-service`.
 
 e.g. For bigboot-service, you'd use `bigboot_development` for development.
@@ -148,11 +148,11 @@ production:
 
 ### UTF8 and binary collation
 
-The example config above will ensure your database connection is using 
+The example config above will ensure your database connection is using
 the `utf8` character set, and `utf8_bin` collation which is required for all
-AAF applications. 
+AAF applications.
 
-However you *MUST* also create a migration which ensures the correct setting 
+However you *MUST* also create a migration which ensures the correct setting
 is applied at the database level:
 
 ```ruby
@@ -305,7 +305,7 @@ end
 ```
 
 ### API Subject
-An API Subject is an extension of the Subject concept reserved specifically for Subjects that utilise x509 client certificate verification to make requests to the applications RESTful API endpoints.
+An API Subject is an extension of the Subject concept reserved specifically for Subjects that utilise x509 client certificate verification to make requests to the applications RESTful API endpoints. x509_cn client certificates **MUST** be unique.
 
 #### Active Model
 ``` ruby
@@ -316,6 +316,7 @@ class APISubject < ActiveRecord::Base
   has_many :roles, through: :api_subject_roles
 
   valhammer
+  validates :x509_cn, format: { with: /\A[\w-]+\z/ }
 
   def permissions
     # This could be extended to gather permissions from
@@ -353,6 +354,7 @@ class APISubject < Sequel::Model
   def validate
     validates_presence [:x509_cn, :description,
                         :contact_name, :contact_mail, :enabled]
+    validates_format /\A[\w-]+\z/, :x509_cn
   end
 end
 ```
