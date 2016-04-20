@@ -110,7 +110,7 @@ cases this will be xyz-service, you should drop the `-service`.
 
 e.g. For bigboot-service, you'd use `bigboot_app`
 
-Database name: `xyz_#{env}` - where xyz represents the name of your application. 
+Database name: `xyz_#{env}` - where xyz represents the name of your application.
 In most cases this will be xyz-service, you should drop the `-service`.
 
 e.g. For bigboot-service, you'd use `bigboot_development` for development.
@@ -148,11 +148,11 @@ production:
 
 ### UTF8 and binary collation
 
-The example config above will ensure your database connection is using 
+The example config above will ensure your database connection is using
 the `utf8` character set, and `utf8_bin` collation which is required for all
-AAF applications. 
+AAF applications.
 
-However you *MUST* also create a migration which ensures the correct setting 
+However you *MUST* also create a migration which ensures the correct setting
 is applied at the database level:
 
 ```ruby
@@ -454,6 +454,40 @@ RSpec.describe Permission, type: :model do
   # TODO: examples for your model extensions here
 end
 ```
+
+### Foreign Keys
+
+Rails 4.2 and above support a new foreign keys DSL. This is feature is not presently enabled in all databases [see supported database list](http://edgeguides.rubyonrails.org/4_2_release_notes.html#foreign-key-support) but you can safely integrate this supplied tests regardless of database.
+
+#### Adding Foreign Keys
+
+Include these foreign keys in a relevant migration.
+
+```ruby
+add_foreign_key 'api_subject_roles', 'api_subjects'
+add_foreign_key 'api_subject_roles', 'roles'
+add_foreign_key 'permissions', 'roles'
+add_foreign_key 'subject_roles', 'roles'
+add_foreign_key 'subject_roles', 'subjects'
+```
+
+#### RSpec shared examples
+
+The shared examples will **only** be run if your current database configuration supports foreign keys. Otherwise they will be safely ignored by rspec at runtime.
+
+```ruby
+require 'rails_helper'
+
+require 'gumboot/shared_examples/foreign_keys'
+
+RSpec.describe 'Foreign Keys' do
+  include_examples 'Foreign Keys'
+
+  # TODO: examples for your foreign key extensions here
+
+end
+```
+
 
 ## Access Control
 TODO
