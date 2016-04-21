@@ -1,51 +1,39 @@
+conn = ActiveRecord::Base.connection
+
 RSpec.shared_examples 'Foreign Keys' do
-  conn = ActiveRecord::Base.connection
-  context 'Permissions Foreign Keys', if: conn.supports_foreign_keys? do
-    let(:permission_fk) do
-      conn.foreign_keys(:permissions).find do |fk|
-        fk.options[:column] == 'role_id'
+  describe 'DB Supports Foreign Keys', if: conn.supports_foreign_keys? do
+    context 'Permissions Foreign Keys' do
+      it 'should have a foreign key' do
+        expect(table_has_fk('permissions', 'role_id')).to be true
       end
     end
-    it 'should have a foreign key' do
-      expect(permission_fk).to_not be_nil
-    end
-  end
 
-  context 'Api Subject Roles Foreign Keys', if: conn.supports_foreign_keys? do
-    let(:subject_id) do
-      conn.foreign_keys(:api_subject_roles).find do |fk|
-        fk.options[:column] == 'api_subject_id'
+    context 'Api Subject Roles Foreign Keys' do
+      it 'should have a subject_id foreign key' do
+        expect(table_has_fk('api_subject_roles', 'api_subject_id')).to be true
+      end
+      it 'should have a role_id foreign key' do
+        expect(table_has_fk('api_subject_roles', 'role_id')).to be true
       end
     end
-    let(:role_id) do
-      conn.foreign_keys(:api_subject_roles).find do |fk|
-        fk.options[:column] == 'role_id'
-      end
-    end
-    it 'should have a subject_id foreign key' do
-      expect(subject_id).to_not be_nil
-    end
-    it 'should have a role_id foreign key' do
-      expect(role_id).to_not be_nil
-    end
-  end
 
-  context 'Subject Roles Foreign Keys', if: conn.supports_foreign_keys? do
-    let(:subject_id) do
-      conn.foreign_keys(:subject_roles).find do |fk|
-        fk.options[:column] == 'subject_id'
+    context 'Subject Roles Foreign Keys' do
+      it 'should have a subject_id foreign key' do
+        expect(table_has_fk('subject_roles', 'subject_id')).to be true
+      end
+      it 'should have a role_id foreign key' do
+        expect(table_has_fk('subject_roles', 'role_id')).to be true
       end
     end
-    let(:role_id) do
-      conn.foreign_keys(:subject_roles).find do |fk|
-        fk.options[:column] == 'role_id'
+
+    def table_has_fk(table, foreign_key)
+      if ActiveRecord::Base.connection.foreign_keys(table).find do |fk|
+        fk.options[:column] == foreign_key
+      end.nil?
+        return false
+      else
+        return true
       end
-    end
-    it 'should have a subject_id foreign key' do
-      expect(subject_id).to_not be_nil
-    end
-    it 'should have a role_id foreign key' do
-      expect(role_id).to_not be_nil
     end
   end
 end
