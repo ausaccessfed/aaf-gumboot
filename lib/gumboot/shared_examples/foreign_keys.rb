@@ -3,11 +3,14 @@ def conn
 end
 
 RSpec.shared_examples 'fk' do |from_table, to_table, fk|
-  context "Configured between '#{from_table}' and '#{to_table}' tables", if: conn.supports_foreign_keys? do
-    it "'#{from_table}' table should have '#{fk}' configured as a foreign key'" do
+  context "Configured between '#{from_table}' and '#{to_table}' tables", if:
+    conn.supports_foreign_keys? do
+    it "'#{from_table}' table should have '#{fk}' configured as a foreign
+    key'" do
       expect(table_has_fk(from_table, fk)).to be_truthy
     end
-    it "the '#{fk}' foreign key in the '#{from_table}' table should point to the '#{to_table}' table" do
+    it "the '#{fk}' foreign key in the '#{from_table}' table should point to
+      the '#{to_table}' table" do
       expect(fk_exists_between(from_table, to_table, fk)).to be_truthy
     end
   end
