@@ -1,4 +1,6 @@
-conn = ActiveRecord::Base.connection
+def conn
+  return ActiveRecord::Base.connection
+end
 
 RSpec.shared_examples 'Foreign Keys' do
   describe 'DB Supports Foreign Keys', if: conn.supports_foreign_keys? do
@@ -53,7 +55,7 @@ RSpec.shared_examples 'Foreign Keys' do
     end
 
     def table_has_fk(table, foreign_key)
-      f = ActiveRecord::Base.connection.foreign_keys(table).find do |fk|
+      f = conn.foreign_keys(table).find do |fk|
         fk.options[:column] == foreign_key
       end
       return false if f.nil?
@@ -61,7 +63,7 @@ RSpec.shared_examples 'Foreign Keys' do
     end
 
     def fk_exists_between(from_table, to_table)
-      f = ActiveRecord::Base.connection.foreign_keys(from_table).find do |fk|
+      f = conn.foreign_keys(from_table).find do |fk|
         fk[:to_table] == to_table
       end
       return false if f.nil?
