@@ -475,6 +475,8 @@ add_foreign_key 'subject_roles', 'subjects'
 
 The shared examples will **only** be run if your current database configuration supports foreign keys. Otherwise they will be safely ignored by rspec at runtime.
 
+**Important Note:** These specs are **ONLY** valid for ActiveRecord. Sequel users should implement their own specs to test foreign keys meet the required specification.  
+
 ```ruby
 require 'rails_helper'
 
