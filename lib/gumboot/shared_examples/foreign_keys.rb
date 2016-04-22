@@ -8,7 +8,7 @@ RSpec.shared_examples 'Foreign Keys' do |from_table, to_table, fk|
       expect(table_has_fk(from_table, fk)).to be_truthy
     end
     it 'should have a foreign key that points to the correct table' do
-      expect(fk_exists_between(from_table, to_table)).to be_truthy
+      expect(fk_exists_between(from_table, to_table, fk)).to be_truthy
     end
   end
 
@@ -18,9 +18,9 @@ RSpec.shared_examples 'Foreign Keys' do |from_table, to_table, fk|
     end
   end
 
-  def fk_exists_between(from_table, to_table)
+  def fk_exists_between(from_table, to_table, foreign_key)
     conn.foreign_keys(from_table).find do |fk|
-      fk[:to_table] == to_table
+      fk[:to_table] == to_table && fk.options[:column] == foreign_key
     end
   end
 end
