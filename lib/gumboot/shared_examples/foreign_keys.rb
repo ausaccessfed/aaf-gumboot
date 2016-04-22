@@ -1,71 +1,26 @@
 def conn
-  return ActiveRecord::Base.connection
+  ActiveRecord::Base.connection
 end
 
-RSpec.shared_examples 'Foreign Keys' do
-  describe 'DB Supports Foreign Keys', if: conn.supports_foreign_keys? do
-    context 'Permissions Foreign Keys' do
-      it 'should have a foreign key' do
-        expect(table_has_fk('permissions', 'role_id')).to be_truthy
-      end
-      it 'should have a foreign key that points to the correct table' do
-        expect(fk_exists_between('permissions', 'roles')).to be_truthy
-      end
+RSpec.shared_examples 'Foreign Keys' do |from_table, to_table, fk|
+  context 'Permissions Foreign Keys', if: conn.supports_foreign_keys? do
+    it 'should have a foreign key' do
+      expect(table_has_fk(from_table, fk)).to be_truthy
     end
-
-    context 'Api Subject Roles Foreign Keys' do
-      context 'api_subject_id foreign key' do
-        it 'should have a subject_id foreign key' do
-          expect(
-            table_has_fk('api_subject_roles', 'api_subject_id')
-          ).to be_truthy
-        end
-        it 'should have a foreign key that points to the correct table' do
-          expect(
-            fk_exists_between('api_subject_roles', 'api_subjects')
-          ).to be_truthy
-        end
-      end
-
-      context 'api_subject_id foreign key' do
-        it 'should have a role_id foreign key' do
-          expect(table_has_fk('api_subject_roles', 'role_id')).to be_truthy
-        end
-        it 'should have a foreign key that points to the correct table' do
-          expect(fk_exists_between('api_subject_roles', 'roles')).to be_truthy
-        end
-      end
+    it 'should have a foreign key that points to the correct table' do
+      expect(fk_exists_between(from_table, to_table)).to be_truthy
     end
+  end
 
-    context 'Subject Roles Foreign Keys' do
-      context 'subject_id foreign key' do
-        it 'should have a subject_id foreign key' do
-          expect(table_has_fk('subject_roles', 'subject_id')).to be_truthy
-        end
-        it 'should have a foreign key that points to the correct table' do
-          expect(fk_exists_between('subject_roles', 'subjects')).to be_truthy
-        end
-      end
-      context 'role_id foreign key' do
-        it 'should have a role_id foreign key' do
-          expect(table_has_fk('subject_roles', 'role_id')).to be_truthy
-        end
-        it 'should have a foreign key that points to the correct table' do
-          expect(fk_exists_between('subject_roles', 'roles')).to be_truthy
-        end
-      end
+  def table_has_fk(table, foreign_key)
+    conn.foreign_keys(table).find do |fk|
+      fk.options[:column] == foreign_key
     end
+  end
 
-    def table_has_fk(table, foreign_key)
-      conn.foreign_keys(table).find do |fk|
-        fk.options[:column] == foreign_key
-      end
-    end
-
-    def fk_exists_between(from_table, to_table)
-      conn.foreign_keys(from_table).find do |fk|
-        fk[:to_table] == to_table
-      end
+  def fk_exists_between(from_table, to_table)
+    conn.foreign_keys(from_table).find do |fk|
+      fk[:to_table] == to_table
     end
   end
 end
