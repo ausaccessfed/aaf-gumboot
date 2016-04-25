@@ -483,7 +483,7 @@ require 'rails_helper'
 require 'gumboot/shared_examples/foreign_keys'
 
 RSpec.describe 'Foreign Keys' do
-  include_examples 'Foreign Keys'
+  include_examples 'Gumboot Foreign Keys'
 
   # TODO: examples for your foreign key extensions here
 
