@@ -8,7 +8,6 @@ ActiveRecord::Schema.define(version: 0) do
     t.string :value, null: false
     t.belongs_to :role, null: false
     t.timestamps null: false
-
     t.index [:role_id, :value], unique: true
   end
 
@@ -43,4 +42,10 @@ ActiveRecord::Schema.define(version: 0) do
     t.belongs_to :role, null: false
     t.timestamps null: false
   end
+
+  add_foreign_key 'api_subject_roles', 'api_subjects'
+  add_foreign_key 'api_subject_roles', 'roles'
+  add_foreign_key 'permissions', 'roles'
+  add_foreign_key 'subject_roles', 'roles'
+  add_foreign_key 'subject_roles', 'subjects'
 end

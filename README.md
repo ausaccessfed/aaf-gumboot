@@ -457,6 +457,42 @@ RSpec.describe Permission, type: :model do
 end
 ```
 
+### Foreign Keys
+
+Rails 4.2 and above support a new foreign keys DSL. This is feature is not presently enabled in all databases [see supported database list](http://edgeguides.rubyonrails.org/4_2_release_notes.html#foreign-key-support) but you can safely integrate this supplied tests regardless of database.
+
+#### Adding Foreign Keys
+
+Include these foreign keys in a relevant migration.
+
+```ruby
+add_foreign_key 'api_subject_roles', 'api_subjects'
+add_foreign_key 'api_subject_roles', 'roles'
+add_foreign_key 'permissions', 'roles'
+add_foreign_key 'subject_roles', 'roles'
+add_foreign_key 'subject_roles', 'subjects'
+```
+
+#### RSpec shared examples
+
+The shared examples will **only** be run if your current database configuration supports foreign keys. Otherwise they will be safely ignored by rspec at runtime.
+
+**Important Note:** These specs are **ONLY** valid for ActiveRecord. Sequel users should implement their own specs to test foreign keys meet the required specification.  
+
+```ruby
+require 'rails_helper'
+
+require 'gumboot/shared_examples/foreign_keys'
+
+RSpec.describe 'Foreign Keys' do
+  include_examples 'Gumboot Foreign Keys'
+
+  # TODO: examples for your foreign key extensions here
+
+end
+```
+
+
 ## Access Control
 TODO
 

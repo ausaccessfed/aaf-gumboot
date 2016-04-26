@@ -37,5 +37,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'guard-rubocop'
   spec.add_development_dependency 'guard-bundler'
 
-  spec.add_development_dependency 'rails', '~> 4.1.7'
+  spec.add_development_dependency 'rails', '~> 4.2.6'
 end
