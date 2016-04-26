@@ -19,10 +19,12 @@ RSpec.shared_examples 'Gumboot Foreign Keys' do
   end
 
   context 'Permission' do
-    include_examples 'gumboot fk' do
-      let(:from_table) { 'permissions' }
-      let(:to_table) { 'roles' }
-      let(:column) { 'role_id' }
+    context 'Roles' do
+      include_examples 'gumboot fk' do
+        let(:from_table) { 'permissions' }
+        let(:to_table) { 'roles' }
+        let(:column) { 'role_id' }
+      end
     end
   end
 
@@ -46,19 +48,17 @@ RSpec.shared_examples 'Gumboot Foreign Keys' do
     end
   end
 
-  context 'Role' do
+  context 'Roles' do
+    let(:to_table) { 'roles' }
+    let(:column) { 'role_id' }
     context 'Subjects' do
       include_examples 'gumboot fk' do
         let(:from_table) { 'subject_roles' }
-        let(:to_table) { 'roles' }
-        let(:column) { 'role_id' }
       end
     end
-    context 'API Subject' do
+    context 'API Subjects' do
       include_examples 'gumboot fk' do
         let(:from_table) { 'api_subject_roles' }
-        let(:to_table) { 'roles' }
-        let(:column) { 'role_id' }
       end
     end
   end
