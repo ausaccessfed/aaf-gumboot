@@ -75,7 +75,7 @@ group :development, :test do
   gem 'guard-bundler', require: false
   gem 'guard-rubocop', require: false
   gem 'guard-rspec', require: false
-  gem 'guard-brakeman', require: false
+  gem 'brakeman', '~> 3.2.1', require: false
   gem 'terminal-notifier-guard', require: false
 
   gem 'aaf-gumboot'
@@ -255,7 +255,8 @@ class Subject < ActiveRecord::Base
   def permissions
     # This could be extended to gather permissions from
     # other data sources providing input to subject identity
-    roles.flat_map { |role| role.permissions.map(&:value) }
+    roles.preload(:permissions)
+         .flat_map { |role| role.permissions.map(&:value) }
   end
 
   def functioning?
@@ -321,7 +322,8 @@ class APISubject < ActiveRecord::Base
   def permissions
     # This could be extended to gather permissions from
     # other data sources providing input to api_subject identity
-    roles.flat_map { |role| role.permissions.map(&:value) }
+    roles.preload(:permissions)
+         .flat_map { |role| role.permissions.map(&:value) }
   end
 
   def functioning?
