@@ -138,6 +138,80 @@ Execute:
 
     $ bundle
 
+## Guard
+Gumboot projects make use of Guard, Rubocop, RSpec and Brakeman.
+
+To get this all up and running you should execute:
+
+	$ bundle exec guard init
+	
+The result will be a reasonably complete `Guardfile`. As described earlier you can remove the default comments that are generated and also references to the Turnip project which we don't utilise.
+
+### RSpec
+Add a RSpec config file `.rspec`:
+
+```
+--color
+--require spec_helper
+--format documentation
+```
+
+### Rubocop
+Add a Rubocop config file `.rubocop.yml`:
+
+```
+AllCops:
+  TargetRubyVersion: 2.3
+  Exclude:
+    - db/schema.rb
+
+Rails:
+  Enabled: true
+
+Rails/Output:
+  Exclude:
+    - db/seeds.rb
+
+Style/Documentation:
+  Enabled: false
+
+Metrics/MethodLength:
+  Exclude:
+    - db/migrate/*.rb
+
+Metrics/AbcSize:
+  Exclude:
+    - db/migrate/*.rb
+```
+
+### Simplecov
+Add a simplecov config file `.simplecov`:
+
+```
+SimpleCov.start('rails') do
+  minimum_coverage 100
+end
+```
+
+## Git Ignore
+This needs to be customised per application but be sure it excludes **all** local config files, keys, certificates and anything else containing secrets. For example:
+
+```
+# TODO this is application specific
+config/xyz_service.yml
+
+config/rapidconnect.yml
+config/api-client.*
+config/event_encryption_key.pem
+spec/examples.txt
+
+coverage
+tmp
+log
+vendor
+.DS_Store
+```
+
 ## Acronyms
 Ensure 'API' is an acronym within your application:
 
