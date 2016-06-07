@@ -39,20 +39,72 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ```
 
-## Gems
+## Your local development environment
+Before you get started you should ensure your development machine has the following files located under `~/.aaf`.
 
+1. `rapidconnect.yml`
+
+	Generate a secret to use with Rapid Connect with the following: 
+		
+		$> tr -dc '[[:alnum:][:punct:]]' < /dev/urandom | head -c32 ;echo
+		
+	Access [https://rapid.test.aaf.edu.au](https://rapid.test.aaf.edu.au) and register using your secret created above and the callback URL of `http://localhost:8080/auth/jwt`
+
+	As a result of successful registration you can add your secret and the URL the registration provided to you in the format below to your `rapidconnect.yml` file.
+
+	``` ruby
+	---
+	url: 'https://rapid.test.aaf.edu.au/jwt/authnrequest/.....'
+	secret: '<you must generate this>'
+	issuer: 'https://rapid.test.aaf.edu.au'
+	audience: 'http://localhost:8080'
+	```
+	
+2. Create a key for use with event code called `event_encryption_key.pem` via the command `openssl genrsa -out ~/.aaf/event_encryption_key.pem 2048`
+
+3. Create a key and CSR for use with access to other AAF application API endpoints.
+
+	1. `openssl genrsa -out api-client.key 2048`
+	2. `openssl req -new -key api-client.key -out api-client.csr -subj '/CN=Your Name Here/'`
+	2. Access [https://certs.aaf.edu.au/](https://certs.aaf.edu.au/)
+	3. Request a certificate under `Australian Access Federation` provide your CSR and select the CA 'AAF API Client CA'
+	4. Wait for approval
+	5. One approved your certificate link will be sent to you in email, download this file
+	6. Record the certificate CN, you will need this in the future
+	7. Rename the downloaded file as api-client.crt 
+
+Here is what your `~/.aaf` should end up looking like:
+
+```
+$ ls -l
+
+total 32
+
+api-client.crt
+api-client.key
+event_encryption_key.pem
+rapidconnect.yml
+```
+
+## General advice for AAF Ruby applications
+For AAF staff this document assumes you've already read and are following the more general AAF [development workflow](https://github.com/ausaccessfed/developmentworkflow). 
+
+### Code Comments
+In general AAF ruby based applications don't need 'default' or 'generated' comments committed to our code. We're all experienced developers so this kind of extraneous comment doesn't make sense in our space. You should remove these prior to submitting PR.
+
+Of course ACTUAL comments describing something you've written that is a little bit odd or unusual are very much welcome.
+
+## Gems
 The way we build ruby applications has tried to be standardised as much as possible at a base layer. You're likely going to want all these Gems in your Gemfile for a Rails app or a considerable subset of them for a non Rails app.
 
 ```ruby
 gem 'rails', '4.2.3' # Ensure latest release
 gem 'mysql2'
 
-gem 'rapid-rack'
 gem 'valhammer'
 gem 'accession'
-gem 'aaf-lipstick'
 
-gem 'unicorn', require: false
+gem 'puma', require: false
 gem 'god', require: false
 
 group :development, :test do
@@ -82,12 +134,12 @@ group :development, :test do
 end
 ```
 
-And then execute:
+Execute:
 
     $ bundle
 
 ## Acronyms
-Before getting started it is **strongly recommended** that you ensure 'API' is an acronym within your application
+Ensure 'API' is an acronym within your application:
 
 e.g for Rails applications in config/initializers/inflections.rb
 
@@ -96,11 +148,136 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.acronym 'API'
 end
 ```
+## Authentication and Identity (1 of 2)
+There are two options for AAF applications to authenticate and obtain identity
+information for subjects, Rapid Connect and SAML/Shibboleth.
+Unless otherwise specified for your project default to using Rapid Connect.
+
+### Rapid Connect using rapid-rack gem
+
+#### Gemfile
+Add the following gem to your Gemfile in the default group:
+
+``` ruby
+gem 'rapid-rack'
+```
+
+Execute:
+
+    $ bundle
+
+#### Authentication Reciever
+To utilise Rapid Connect your application will require a reciever class
+which will receive the validated claim from Rapid Connect and establish a
+session for the authenticated subject.
+
+As an initial step our reciever class will be a no-op. You'll implement the reciever, in full, later in this document.
+
+Create `lib/authentication.rb`:
+
+``` ruby
+# frozen_string_literal: true
+module Authentication
+end
+
+require 'authentication/subject_receiver'
+```
+
+Create `lib/authentication/subject_receiver.rb`:
+
+``` ruby
+# frozen_string_literal: true
+module Authentication
+  class SubjectReceiver
+    include RapidRack::DefaultReceiver
+    include RapidRack::RedisRegistry
+
+    def map_attributes(_env, attrs)
+      {}
+    end
+
+    def subject(_env, attrs)
+    end
+	end
+end
+```
+
+#### Configure Reciever
+Add the following to `config/application.rb`:
+
+``` ruby
+config.autoload_paths += [
+  File.join(config.root, 'lib')
+]
+config.rapid_rack.receiver = 'Authentication::SubjectReceiver'
+```
+
+#### Configure routes
+Add the following to `config/routes.yml`:
+
+``` ruby
+mount RapidRack::Engine => '/auth'
+```
+
+### SAML/Shibboleth using saml-rack gem
+**TODO**: This needs to be written along with finalisation of the shib-rack readme,
+currently being authored at https://github.com/ausaccessfed/shib-rack under the
+`feature/readme` branch. This section should essentially mirror the above for
+Rapid Connect given the concepts in each gem are reasonably similar.
+
+## Setup
+All AAF applications utilise a standard setup process. This makes it easier for
+developers who are new to a project as all you should need to know to get
+started is `./bin/setup`. In addition this helps with merging in additional
+config options as projects grow.
+
+### Service specific config
+
+Most of our applications require unique configuration at deployment time and we structure this within a standard location of `config/xyz_service.yml.dist`. Replace **xyz** with the name of your application. e.g. For bigboot-service, you'd use `config/bigboot_service.yml.dist`
+
+### Create a custom setup script for your application
+
+The general structure of your `./bin/setup` file should be as follows:
+
+```ruby
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+Dir.chdir File.expand_path('..', File.dirname(__FILE__))
+
+puts '== Installing dependencies =='
+system 'gem install bundler --conservative'
+system 'bundle check || bundle install'
+
+require 'bundler/setup'
+require 'gumboot/strap'
+
+include Gumboot::Strap
+
+puts "\n== Installing configuration files =="
+
+link_global_configuration %w(api-client.crt api-client.key event_encryption_key.pem)
+                             
+# Rapid Connect Applications must enable this
+# link_global_configuration %w(rapidconnect.yml)
+
+# TODO: Name this per your local app
+update_local_configuration %w(xyz_service.yml)
+
+puts "\n== Loading Rails environment =="
+require_relative '../config/environment'
+
+ensure_activerecord_databases(%w(test development))
+maintain_activerecord_schema
+clean_logs
+clean_tempfiles
+```
+
+You can find task details (or add new ones) at [https://github.com/ausaccessfed/aaf-gumboot/blob/develop/lib/gumboot/strap.rb](https://github.com/ausaccessfed/aaf-gumboot/blob/develop/lib/gumboot/strap.rb).
 
 ## Database
 
 ### Configuration
-
 **Note:** This is only applicable to applications using MySQL / MariaDB.
 
 We use the following conventions for naming around databases:
@@ -124,7 +301,7 @@ production defaults.
 ```yaml
 default: &default
   adapter: mysql2
-  username: example_app
+  username: xyz_app
   password: password
   host: 127.0.0.1
   pool: 5
@@ -133,21 +310,20 @@ default: &default
 
 development:
   <<: *default
-  database: example_development
+  database: xyz_development
 
 test:
   <<: *default
-  database: example_test
+  database: xyz_test
 
 production:
   <<: *default
-  username: <%= ENV['EXAMPLE_DB_USERNAME'] %>
-  password: <%= ENV['EXAMPLE_DB_PASSWORD'] %>
-  database: <%= ENV['EXAMPLE_DB_NAME'] %>
+  username: <%= ENV['XYZ_DB_USERNAME'] %>
+  password: <%= ENV['XYZ_DB_PASSWORD'] %>
+  database: <%= ENV['XYZ_DB_NAME'] %>
 ```
 
 ### UTF8 and binary collation
-
 The example config above will ensure your database connection is using
 the `utf8` character set, and `utf8_bin` collation which is required for all
 AAF applications.
@@ -180,7 +356,6 @@ end
 ```
 
 #### Existing Applications
-
 For any existing app which adopts this set of tests, it is not sufficient to
 change the configuration and run all migrations again on a clean database. All
 tables which predate the configuration change MUST have a migration created
@@ -202,7 +377,6 @@ be applied correctly during `rake db:schema:load` due to the new database
 collation setting.
 
 ### Continuous Integration environments
-
 An often-seen pattern on CI servers is to use a database which was created
 out-of-band before permissions were granted to access the database. This very
 rarely results in the correct collation setting for the database.
@@ -221,8 +395,8 @@ There are two ways we can address this easily:
     method). For example:
 
     ```
-    mysql -e 'ALTER DATABASE COLLATE = utf8_bin' my_app_development
-    mysql -e 'ALTER DATABASE COLLATE = utf8_bin' my_app_test
+    mysql -e 'ALTER DATABASE COLLATE = utf8_bin' xyz_development
+    mysql -e 'ALTER DATABASE COLLATE = utf8_bin' xyz_test
     ```
 
 Also note that some CI platforms will automatically set your
@@ -477,7 +651,7 @@ add_foreign_key 'subject_roles', 'subjects'
 
 The shared examples will **only** be run if your current database configuration supports foreign keys. Otherwise they will be safely ignored by rspec at runtime.
 
-**Important Note:** These specs are **ONLY** valid for ActiveRecord. Sequel users should implement their own specs to test foreign keys meet the required specification.  
+**Important Note:** These specs are **ONLY** valid for ActiveRecord. Sequel users should implement their own specs to test foreign keys meet the required specification.
 
 ```ruby
 require 'rails_helper'
@@ -492,9 +666,12 @@ RSpec.describe 'Foreign Keys' do
 end
 ```
 
+## Authentication and Identity (2 of 2)
+You should now follow the documention for [https://github.com/ausaccessfed/rapid-rack](https://github.com/ausaccessfed/rapid-rack) or [https://github.com/ausaccessfed/shib-rack](https://github.com/ausaccessfed/shib-rack) depending on how your application is handling authentication and identity to complete your reciever implementation.
 
 ## Access Control
-TODO
+
+**TODO**
 
 ## Controllers
 
@@ -610,7 +787,8 @@ There are three possible types of client errors on API calls that receive reques
 Response errors will contain JSON with the 'message' or 'errors' values specified to give more visibility into what went wrong.
 
 ### Documenting resources
-TODO.
+
+**TODO**
 
 ### Responding to requests
 To ensure all AAF API work the same a base controller for all API related controllers to extend from is recommended.
@@ -775,4 +953,5 @@ end
 ```
 
 # Event Handling
-TODO - Publishing and consuming events from AAF SQS.
+
+**TODO** - Publishing and consuming events from AAF SQS.
