@@ -50,12 +50,14 @@ Before you get started you should ensure your development machine has the follow
 		
 	Access [https://rapid.test.aaf.edu.au](https://rapid.test.aaf.edu.au) and register using your secret created above and the callback URL of `http://localhost:8080/auth/jwt`
 
-	As a result of successful registration you can add your secret and the URL the registration provided to you in the format below to your `rapidconnect.yml` file.
+	Upon successful registration you cannot simply use the URL Rapid Connect provides by team. Request one of the team change your registration to be of the type `AU Research`. They can then provide you the appropriate URL to enter below.
+	
+	Edit your `rapidconnect.yml` to contains:
 
 	``` ruby
 	---
 	url: 'https://rapid.test.aaf.edu.au/jwt/authnrequest/.....'
-	secret: '<you must generate this>'
+	secret: '<you generated this>'
 	issuer: 'https://rapid.test.aaf.edu.au'
 	audience: 'http://localhost:8080'
 	```
@@ -250,12 +252,12 @@ Execute:
 
     $ bundle
 
-#### Authentication Reciever
-To utilise Rapid Connect your application will require a reciever class
+#### Authentication Receiver
+To utilise Rapid Connect your application will require a receiver class
 which will receive the validated claim from Rapid Connect and establish a
 session for the authenticated subject.
 
-As an initial step our reciever class will be a no-op. You'll implement the reciever, in full, later in this document.
+As an initial step our receiver class will be a no-op. You'll implement the receiver, in full, later in this document.
 
 Create `lib/authentication.rb`:
 
@@ -282,11 +284,11 @@ module Authentication
 
     def subject(_env, attrs)
     end
-	end
+  end
 end
 ```
 
-#### Configure Reciever
+#### Configure receiver
 Add the following to `config/application.rb`:
 
 ``` ruby
@@ -751,7 +753,7 @@ end
 ```
 
 ## Authentication and Identity (2 of 2)
-You should now follow the documention for [https://github.com/ausaccessfed/rapid-rack](https://github.com/ausaccessfed/rapid-rack) or [https://github.com/ausaccessfed/shib-rack](https://github.com/ausaccessfed/shib-rack) depending on how your application is handling authentication and identity to complete your reciever implementation.
+You should now follow the documention for [https://github.com/ausaccessfed/rapid-rack](https://github.com/ausaccessfed/rapid-rack) or [https://github.com/ausaccessfed/shib-rack](https://github.com/ausaccessfed/shib-rack) depending on how your application is handling authentication and identity to complete your receiver implementation.
 
 ## Access Control
 
