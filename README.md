@@ -202,7 +202,7 @@ end
 Edit `spec/spec_helper.rb` and add
 
 ``` ruby
-require simplecov
+require 'simplecov'
 ```
 
 ## Git Ignore
