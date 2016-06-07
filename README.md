@@ -148,7 +148,11 @@ To get this all up and running you should execute:
 The result will be a reasonably complete `Guardfile`. As described earlier you can remove the default comments that are generated and also references to the Turnip project which we don't utilise.
 
 ### RSpec
-Add a RSpec config file `.rspec`:
+Execute:
+
+	$ bundle exec rails generate rspec:install
+	
+Modify the generated RSpec config file as follows `.rspec`:
 
 ```
 --color
@@ -191,6 +195,12 @@ Add a simplecov config file `.simplecov`:
 SimpleCov.start('rails') do
   minimum_coverage 100
 end
+```
+
+Edit `spec/spec_helper.rb` and add
+
+``` ruby
+require simplecove
 ```
 
 ## Git Ignore
