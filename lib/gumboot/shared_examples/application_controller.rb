@@ -116,7 +116,7 @@ RSpec.shared_examples 'Application controller' do
         end
 
         it 'GET request should create a uri session including fragments' do
-          get :an_action, time: 1000
+          get :an_action, params: { time: 1000 }
           uri = URI.parse(session[:return_url])
 
           expect(uri.path).to eq('/anonymous/an_action')
