@@ -61,7 +61,7 @@ RSpec.describe Gumboot::Strap do
     end
 
     it 'creates the databases' do
-      expect(client).to receive(:query) .with(create_db_query('one_db')).once
+      expect(client).to receive(:query).with(create_db_query('one_db')).once
       expect(client).to receive(:query).with(create_db_query('two_db')).once
 
       allow(client).to receive(:query).with(match(/^GRANT ALL.*/))
