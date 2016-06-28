@@ -61,10 +61,8 @@ RSpec.describe Gumboot::Strap do
     end
 
     it 'creates the databases' do
-      expect(client).to receive(:query)
-        .with('CREATE DATABASE IF NOT EXISTS `one_db`').once
-      expect(client).to receive(:query)
-        .with('CREATE DATABASE IF NOT EXISTS `two_db`').once
+      expect(client).to receive(:query) .with(create_db_query('one_db')).once
+      expect(client).to receive(:query).with(create_db_query('two_db')).once
 
       allow(client).to receive(:query).with(match(/^GRANT ALL.*/))
 
@@ -89,8 +87,7 @@ RSpec.describe Gumboot::Strap do
     let(:opts) { { 'adapter' => 'mysql2', 'database' => 'test_db' } }
 
     it 'creates the database' do
-      expect(client).to receive(:query)
-        .with('CREATE DATABASE IF NOT EXISTS `test_db`').once
+      expect(client).to receive(:query).with(create_db_query('test_db')).once
 
       subject.ensure_database(opts)
     end
@@ -318,5 +315,9 @@ RSpec.describe Gumboot::Strap do
         run
       end
     end
+  end
+
+  def create_db_query(db)
+    "CREATE DATABASE IF NOT EXISTS `#{db}` CHARACTER SET utf8 COLLATE utf8_bin"
   end
 end
