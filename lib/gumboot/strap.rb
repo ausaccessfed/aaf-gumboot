@@ -26,7 +26,8 @@ module Gumboot
       raise('Only supports mysql2 adapter') unless adapter == 'mysql2'
 
       puts "Ensuring database `#{database}` exists"
-      client.query("CREATE DATABASE IF NOT EXISTS `#{database}`")
+      client.query("CREATE DATABASE IF NOT EXISTS `#{database}` " \
+                   'CHARACTER SET utf8 COLLATE utf8_bin')
     end
 
     def ensure_database_user(db)
