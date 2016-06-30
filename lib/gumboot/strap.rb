@@ -54,6 +54,12 @@ module Gumboot
       system 'rake db:migrate'
     end
 
+    def load_seeds
+      message 'Loading seeds'
+
+      system 'rake db:seed'
+    end
+
     def clean_logs
       message 'Removing old tempfiles'
       system 'rm -f log/*'
