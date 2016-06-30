@@ -142,6 +142,13 @@ RSpec.describe Gumboot::Strap do
     end
   end
 
+  context '#load_seeds' do
+    it 'loads the seeds' do
+      expect(subject.kernel).to receive(:system).with('rake db:seed')
+      subject.load_seeds
+    end
+  end
+
   context '#clean_logs' do
     it 'removes the log files' do
       expect(subject.kernel).to receive(:system).with('rm -f log/*')
