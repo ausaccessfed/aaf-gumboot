@@ -44,36 +44,36 @@ Before you get started you should ensure your development machine has the follow
 
 1. `rapidconnect.yml`
 
-	Generate a secret to use with Rapid Connect with the following: 
-		
-		$> tr -dc '[[:alnum:][:punct:]]' < /dev/urandom | head -c32 ;echo
-		
-	Access [https://rapid.test.aaf.edu.au](https://rapid.test.aaf.edu.au) and register using your secret created above and the callback URL of `http://localhost:8080/auth/jwt`
+    Generate a secret to use with Rapid Connect with the following:
 
-	Upon successful registration you cannot simply use the URL Rapid Connect provides by team. Request one of the team change your registration to be of the type `AU Research`. They can then provide you the appropriate URL to enter below.
-	
-	Edit your `rapidconnect.yml` to contains:
+        $> tr -dc '[[:alnum:][:punct:]]' < /dev/urandom | head -c32 ;echo
 
-	``` ruby
-	---
-	url: 'https://rapid.test.aaf.edu.au/jwt/authnrequest/.....'
-	secret: '<you generated this>'
-	issuer: 'https://rapid.test.aaf.edu.au'
-	audience: 'http://localhost:8080'
-	```
-	
+    Access [https://rapid.test.aaf.edu.au](https://rapid.test.aaf.edu.au) and register using your secret created above and the callback URL of `http://localhost:8080/auth/jwt`
+
+    Upon successful registration you cannot simply use the URL Rapid Connect provides by team. Request one of the team change your registration to be of the type `AU Research`. They can then provide you the appropriate URL to enter below.
+
+    Edit your `rapidconnect.yml` to contains:
+
+    ``` ruby
+    ---
+    url: 'https://rapid.test.aaf.edu.au/jwt/authnrequest/.....'
+    secret: '<you generated this>'
+    issuer: 'https://rapid.test.aaf.edu.au'
+    audience: 'http://localhost:8080'
+    ```
+
 2. Create a key for use with event code called `event_encryption_key.pem` via the command `openssl genrsa -out ~/.aaf/event_encryption_key.pem 2048`
 
 3. Create a key and CSR for use with access to other AAF application API endpoints.
 
-	1. `openssl genrsa -out api-client.key 2048`
-	2. `openssl req -new -key api-client.key -out api-client.csr -subj '/CN=Your Name Here/'`
-	2. Access [https://certs.aaf.edu.au/](https://certs.aaf.edu.au/)
-	3. Request a certificate under `Australian Access Federation` provide your CSR and select the CA 'AAF API Client CA'
-	4. Wait for approval
-	5. One approved your certificate link will be sent to you in email, download this file
-	6. Record the certificate CN, you will need this in the future
-	7. Rename the downloaded file as api-client.crt 
+    1. `openssl genrsa -out api-client.key 2048`
+    2. `openssl req -new -key api-client.key -out api-client.csr -subj '/CN=Your Name Here/'`
+    2. Access [https://certs.aaf.edu.au/](https://certs.aaf.edu.au/)
+    3. Request a certificate under `Australian Access Federation` provide your CSR and select the CA 'AAF API Client CA'
+    4. Wait for approval
+    5. One approved your certificate link will be sent to you in email, download this file
+    6. Record the certificate CN, you will need this in the future
+    7. Rename the downloaded file as api-client.crt
 
 Here is what your `~/.aaf` should end up looking like:
 
@@ -89,7 +89,7 @@ rapidconnect.yml
 ```
 
 ## General advice for AAF Ruby applications
-For AAF staff this document assumes you've already read and are following the more general AAF [development workflow](https://github.com/ausaccessfed/developmentworkflow). 
+For AAF staff this document assumes you've already read and are following the more general AAF [development workflow](https://github.com/ausaccessfed/developmentworkflow).
 
 ### Code Comments
 In general AAF ruby based applications don't need 'default' or 'generated' comments committed to our code. We're all experienced developers so this kind of extraneous comment doesn't make sense in our space. You should remove these prior to submitting PR.
@@ -145,15 +145,15 @@ Gumboot projects make use of Guard, Rubocop, RSpec and Brakeman.
 
 To get this all up and running you should execute:
 
-	$ bundle exec guard init
-	
+    $ bundle exec guard init
+
 The result will be a reasonably complete `Guardfile`. As described earlier you can remove the default comments that are generated and also references to the Turnip project which we don't utilise.
 
 ### RSpec
 Execute:
 
-	$ bundle exec rails generate rspec:install
-	
+    $ bundle exec rails generate rspec:install
+
 Modify the generated RSpec config file as follows `.rspec`:
 
 ```
@@ -343,7 +343,7 @@ include Gumboot::Strap
 puts "\n== Installing configuration files =="
 
 link_global_configuration %w(api-client.crt api-client.key event_encryption_key.pem)
-                             
+
 # Rapid Connect Applications must enable this
 # link_global_configuration %w(rapidconnect.yml)
 
