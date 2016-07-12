@@ -515,7 +515,7 @@ class Subject < ActiveRecord::Base
   def permissions
     # This could be extended to gather permissions from
     # other data sources providing input to subject identity
-    roles.flat_map { |role| role.permissions.map(&:value) }
+    roles.joins(:permissions).pluck('permissions.value')
   end
 
   def functioning?
@@ -581,7 +581,7 @@ class APISubject < ActiveRecord::Base
   def permissions
     # This could be extended to gather permissions from
     # other data sources providing input to api_subject identity
-    roles.flat_map { |role| role.permissions.map(&:value) }
+    roles.joins(:permissions).pluck('permissions.value')
   end
 
   def functioning?
