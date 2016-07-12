@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'valhammer'
   spec.add_development_dependency 'factory_girl'
   spec.add_development_dependency 'faker'
-  spec.add_development_dependency 'rspec-rails', '~> 3.1'
+  spec.add_development_dependency 'rspec-rails'
   spec.add_development_dependency 'rubocop'
   spec.add_development_dependency 'simplecov'
   spec.add_development_dependency 'codeclimate-test-reporter'
