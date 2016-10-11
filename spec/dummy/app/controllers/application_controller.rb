@@ -45,11 +45,15 @@ class ApplicationController < ActionController::Base
 
   def unauthorized
     reset_session
-    render 'errors/unauthorized', status: :unauthorized
+    render 'dynamic_errors/unauthorized',
+           status: :unauthorized,
+           layout: 'application'
   end
 
   def forbidden
-    render 'errors/forbidden', status: :forbidden
+    render 'dynamic_errors/forbidden',
+           status: :forbidden,
+           layout: 'application'
   end
 
   def force_authentication
