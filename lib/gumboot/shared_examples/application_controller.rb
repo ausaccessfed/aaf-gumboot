@@ -78,7 +78,13 @@ RSpec.shared_examples 'Application controller' do
         end
 
         it { is_expected.to have_http_status(:unauthorized) }
-        it { is_expected.to render_template('errors/unauthorized') }
+
+        it do
+          is_expected.to render_template(
+            'dynamic_errors/unauthorized',
+            'layouts/application'
+          )
+        end
 
         it 'resets the session' do
           expect(session[:subject_id]).to be_nil
@@ -94,7 +100,13 @@ RSpec.shared_examples 'Application controller' do
         end
 
         it { is_expected.to have_http_status(:unauthorized) }
-        it { is_expected.to render_template('errors/unauthorized') }
+
+        it do
+          is_expected.to render_template(
+            'dynamic_errors/unauthorized',
+            'layouts/application'
+          )
+        end
 
         it 'resets the session' do
           expect(session[:subject_id]).to be_nil
@@ -155,8 +167,12 @@ RSpec.shared_examples 'Application controller' do
           it 'should respond with status code :forbidden (403)' do
             expect(response).to have_http_status(:forbidden)
           end
+
           it 'renders forbidden template' do
-            expect(response).to render_template('errors/forbidden')
+            expect(response).to render_template(
+              'dynamic_errors/forbidden',
+              'layouts/application'
+            )
           end
         end
       end
@@ -178,7 +194,10 @@ RSpec.shared_examples 'Application controller' do
             expect(response).to have_http_status(:forbidden)
           end
           it 'renders forbidden template' do
-            expect(response).to render_template('errors/forbidden')
+            expect(response).to render_template(
+              'dynamic_errors/forbidden',
+              'layouts/application'
+            )
           end
         end
       end
