@@ -7,3 +7,9 @@ Style/FileName:
 
 AllCops:
   TargetRubyVersion: 2.1
+
+Metrics/BlockLength:
+  Exclude:
+    - aaf-gumboot.gemspec
+    - spec/**/*.rb
+    - lib/**/*.rb

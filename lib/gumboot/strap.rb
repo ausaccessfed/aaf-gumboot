@@ -22,16 +22,17 @@ module Gumboot
     end
 
     def ensure_database(db)
-      adapter, database = db.values_at(*%w(adapter database))
+      adapter, database = db.values_at('adapter', 'database')
       raise('Only supports mysql2 adapter') unless adapter == 'mysql2'
 
       puts "Ensuring database `#{database}` exists"
-      client.query("CREATE DATABASE IF NOT EXISTS `#{database}`")
+      client.query("CREATE DATABASE IF NOT EXISTS `#{database}` " \
+                   'CHARACTER SET utf8 COLLATE utf8_bin')
     end
 
     def ensure_database_user(db)
       adapter, database, username, password =
-        db.values_at(*%w(adapter database username password))
+        db.values_at('adapter', 'database', 'username', 'password')
 
       raise('Only supports mysql2 adapter') unless adapter == 'mysql2'
 
@@ -51,6 +52,12 @@ module Gumboot
 
       puts 'Running migrations'
       system 'rake db:migrate'
+    end
+
+    def load_seeds
+      message 'Loading seeds'
+
+      system 'rake db:seed'
     end
 
     def clean_logs

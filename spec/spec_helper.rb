@@ -5,6 +5,11 @@ require 'faker'
 require 'rspec/rails'
 require 'simplecov'
 
+SimpleCov.start do
+  add_filter('spec')
+  add_filter('sample')
+end
+
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../dummy/config/environment.rb', __FILE__)
 
