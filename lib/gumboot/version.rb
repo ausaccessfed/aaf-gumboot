@@ -1,3 +1,3 @@
 module Gumboot
-  VERSION = '0.0.1'.freeze
+  VERSION = '1.0.0-alpha.2'.freeze
 end
