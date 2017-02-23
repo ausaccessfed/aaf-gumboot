@@ -24,7 +24,7 @@ Gumboot sloshes through these **muddy** topics for AAF applications, bringing do
 ![](http://i.imgur.com/XP4Yw6e.jpg)
 
 ```
-Copyright 2014-2015, Australian Access Federation
+Copyright 2014-2017, Australian Access Federation
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
