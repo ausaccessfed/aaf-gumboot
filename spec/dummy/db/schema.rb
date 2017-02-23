@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ActiveRecord::Schema.define(version: 0) do
   create_table :roles do |t|
     t.string :name, null: false

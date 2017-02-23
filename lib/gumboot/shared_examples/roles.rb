@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 RSpec.shared_examples 'Roles' do
   context 'AAF shared implementation' do
     subject { build :role }
