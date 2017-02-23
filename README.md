@@ -46,7 +46,7 @@ Before you get started you should ensure your development machine has the follow
 
     Generate a secret to use with Rapid Connect with the following:
 
-        $> tr -dc '[[:alnum:][:punct:]]' < /dev/urandom | head -c32 ;echo
+        $> LC_CTYPE=C tr -dc '[[:alnum:][:punct:]]' < /dev/urandom | head -c32 ;echo
 
     Access [https://rapid.test.aaf.edu.au](https://rapid.test.aaf.edu.au) and register using your secret created above and the callback URL of `http://localhost:8080/auth/jwt`
 
