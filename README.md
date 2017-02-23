@@ -767,7 +767,9 @@ You should now follow the documention for [https://github.com/ausaccessfed/rapid
 
 ## Controllers
 
-AAF applications must utilise controllers which default to verifying authentication and access control on every request. This can be changed as implementations require to be publicly accessible for example but must be explicitly configured in code to make it clear to all.
+AAF applications must utilise controllers which default to verifying authentication
+and access control on every request. This can be changed as implementations require
+to be publicly accessible for example but must be explicitly configured in code to make it clear to all.
 
 ##### Rails 4.x
 See `spec/dummy/app/controllers/application_controller.rb` for the implementation this example is based on
