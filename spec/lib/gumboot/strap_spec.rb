@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
 require 'mysql2'
@@ -223,7 +224,7 @@ RSpec.describe Gumboot::Strap do
 
     def updated_config
       expect(written).not_to be_empty
-      YAML.load(written.join)
+      YAML.safe_load(written.join)
     end
 
     context 'when the target does not exist' do

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'gumboot/shared_examples/anonymous_controller'
 
 RSpec.shared_examples 'Application controller' do

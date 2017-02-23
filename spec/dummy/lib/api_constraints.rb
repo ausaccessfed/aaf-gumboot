@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class APIConstraints
   def initialize(version:, default: false)
     @version = version
