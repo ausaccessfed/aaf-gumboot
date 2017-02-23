@@ -32,6 +32,8 @@ Metrics/BlockLength:
     - "*.gemspec"
     - spec/**/*.rb
     - lib/tasks/*.rake
+    - config/**/*.rb
+    - db/**/*.rb
 
 Metrics/LineLength:
   Exclude:
