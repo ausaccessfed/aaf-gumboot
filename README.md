@@ -250,6 +250,7 @@ Add the following gem to your Gemfile in the default group:
 
 ``` ruby
 gem 'rapid-rack'
+gem 'super-identity'
 ```
 
 Execute:
@@ -281,6 +282,7 @@ module Authentication
   class SubjectReceiver
     include RapidRack::DefaultReceiver
     include RapidRack::RedisRegistry
+    include SuperIdentity::Client
 
     def map_attributes(_env, attrs)
       {}
