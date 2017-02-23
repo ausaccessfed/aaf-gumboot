@@ -100,39 +100,43 @@ Of course ACTUAL comments describing something you've written that is a little b
 The way we build ruby applications has tried to be standardised as much as possible at a base layer. You're likely going to want all these Gems in your Gemfile for a Rails app or a considerable subset of them for a non Rails app.
 
 ```ruby
-gem 'rails', '4.2.3' # Ensure latest release
 gem 'mysql2'
+gem 'rails', '>= 5.0.0', '< 5.1' # Ensure latest release
 
-gem 'valhammer'
+gem 'aaf-secure_headers'
+gem 'aaf-lipstick'
 gem 'accession'
+gem 'valhammer'
 
-gem 'puma', require: false
 gem 'god', require: false
+gem 'puma', require: false
+
+gem 'local_time'
+
+gem 'rails_admin'
+gem 'rails_admin_aaf_theme'
 
 group :development, :test do
-  gem 'rspec-rails', '~> 3.3.0'
-  gem 'shoulda-matchers'
-
+  gem 'aaf-gumboot'
+  gem 'bullet'
+  gem 'database_cleaner'
   gem 'factory_girl_rails'
   gem 'faker'
-  gem 'timecop'
-  gem 'database_cleaner'
-
-  gem 'rubocop', require: false
-  gem 'simplecov', require: false
-
-  gem 'capybara', require: false
-  gem 'poltergeist', require: false
-  gem 'phantomjs', require: 'phantomjs/poltergeist'
-
   gem 'guard', require: false
-  gem 'guard-bundler', require: false
-  gem 'guard-rubocop', require: false
-  gem 'guard-rspec', require: false
   gem 'guard-brakeman', require: false
+  gem 'guard-bundler', require: false
+  gem 'guard-rspec', require: false
+  gem 'guard-rubocop', require: false
+  gem 'pry'
+  gem 'rails-controller-testing'
+  gem 'rspec-rails', '~> 3.5.0.beta4'
+  gem 'rubocop', require: false
+  gem 'shoulda-matchers'
+  gem 'simplecov', require: false
   gem 'terminal-notifier-guard', require: false
-
-  gem 'aaf-gumboot'
+  gem 'timecop'
+  gem 'web-console', '~> 2.0', require: false
+  gem 'webmock', require: false
 end
 ```
 
