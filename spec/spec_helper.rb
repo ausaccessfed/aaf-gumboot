@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rubygems'
 require 'factory_girl'
 require 'rails/all'
@@ -13,7 +14,7 @@ end
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../dummy/config/environment.rb', __FILE__)
 
-load Rails.root.join('db/schema.rb')
+load Rails.root.join('db', 'schema.rb')
 
 FactoryGirl.find_definitions
 
