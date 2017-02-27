@@ -24,7 +24,7 @@ Gumboot sloshes through these **muddy** topics for AAF applications, bringing do
 ![](http://i.imgur.com/XP4Yw6e.jpg)
 
 ```
-Copyright 2014-2015, Australian Access Federation
+Copyright 2014-2017, Australian Access Federation
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ Before you get started you should ensure your development machine has the follow
 
     Generate a secret to use with Rapid Connect with the following:
 
-        $> tr -dc '[[:alnum:][:punct:]]' < /dev/urandom | head -c32 ;echo
+        $> LC_CTYPE=C tr -dc '[[:alnum:][:punct:]]' < /dev/urandom | head -c32 ;echo
 
     Access [https://rapid.test.aaf.edu.au](https://rapid.test.aaf.edu.au) and register using your secret created above and the callback URL of `http://localhost:8080/auth/jwt`
 
@@ -100,39 +100,43 @@ Of course ACTUAL comments describing something you've written that is a little b
 The way we build ruby applications has tried to be standardised as much as possible at a base layer. You're likely going to want all these Gems in your Gemfile for a Rails app or a considerable subset of them for a non Rails app.
 
 ```ruby
-gem 'rails', '4.2.3' # Ensure latest release
 gem 'mysql2'
+gem 'rails', '>= 5.0.0', '< 5.1' # Ensure latest release
 
-gem 'valhammer'
+gem 'aaf-secure_headers'
+gem 'aaf-lipstick'
 gem 'accession'
+gem 'valhammer'
 
-gem 'puma', require: false
 gem 'god', require: false
+gem 'puma', require: false
+
+gem 'local_time'
+
+gem 'rails_admin'
+gem 'rails_admin_aaf_theme'
 
 group :development, :test do
-  gem 'rspec-rails', '~> 3.3.0'
-  gem 'shoulda-matchers'
-
+  gem 'aaf-gumboot'
+  gem 'bullet'
+  gem 'database_cleaner'
   gem 'factory_girl_rails'
   gem 'faker'
-  gem 'timecop'
-  gem 'database_cleaner'
-
-  gem 'rubocop', require: false
-  gem 'simplecov', require: false
-
-  gem 'capybara', require: false
-  gem 'poltergeist', require: false
-  gem 'phantomjs', require: 'phantomjs/poltergeist'
-
   gem 'guard', require: false
-  gem 'guard-bundler', require: false
-  gem 'guard-rubocop', require: false
-  gem 'guard-rspec', require: false
   gem 'guard-brakeman', require: false
+  gem 'guard-bundler', require: false
+  gem 'guard-rspec', require: false
+  gem 'guard-rubocop', require: false
+  gem 'pry'
+  gem 'rails-controller-testing'
+  gem 'rspec-rails', '~> 3.5.0.beta4'
+  gem 'rubocop', require: false
+  gem 'shoulda-matchers'
+  gem 'simplecov', require: false
   gem 'terminal-notifier-guard', require: false
-
-  gem 'aaf-gumboot'
+  gem 'timecop'
+  gem 'web-console', '~> 2.0', require: false
+  gem 'webmock', require: false
 end
 ```
 
@@ -246,6 +250,7 @@ Add the following gem to your Gemfile in the default group:
 
 ``` ruby
 gem 'rapid-rack'
+gem 'super-identity'
 ```
 
 Execute:
@@ -277,6 +282,7 @@ module Authentication
   class SubjectReceiver
     include RapidRack::DefaultReceiver
     include RapidRack::RedisRegistry
+    include SuperIdentity::Client
 
     def map_attributes(_env, attrs)
       {}
@@ -761,7 +767,9 @@ You should now follow the documention for [https://github.com/ausaccessfed/rapid
 
 ## Controllers
 
-AAF applications must utilise controllers which default to verifying authentication and access control on every request. This can be changed as implementations require to be publicly accessible for example but must be explicitly configured in code to make it clear to all.
+AAF applications must utilise controllers which default to verifying authentication
+and access control on every request. This can be changed as implementations require
+to be publicly accessible for example but must be explicitly configured in code to make it clear to all.
 
 ##### Rails 4.x
 See `spec/dummy/app/controllers/application_controller.rb` for the implementation this example is based on
