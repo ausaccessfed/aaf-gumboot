@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 RSpec.shared_examples 'Anon controller' do
   controller(described_class) do
     def an_action

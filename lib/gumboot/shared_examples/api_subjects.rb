@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 RSpec.shared_examples 'API Subjects' do
   context 'AAF shared implementation' do
     subject { build :api_subject }

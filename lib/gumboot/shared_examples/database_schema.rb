@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 RSpec.shared_examples 'Database Schema' do
   context 'AAF shared implementation' do
     RSpec::Matchers.define :have_collation do |expected, name|

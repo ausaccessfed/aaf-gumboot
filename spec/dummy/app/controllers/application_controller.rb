@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class ApplicationController < ActionController::Base
   Forbidden = Class.new(StandardError)
   private_constant :Forbidden
