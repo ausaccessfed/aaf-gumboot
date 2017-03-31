@@ -114,9 +114,13 @@ module Gumboot
       Rails.logger.info "\n== #{msg} =="
     end
 
+    def safe_load(yaml)
+      YAML.safe_load(yaml, [Symbol])
+    end
+
     def merge_config(src, dest)
-      new_config = YAML.safe_load(File.read(src))
-      old_config = File.exist?(dest) ? YAML.safe_load(File.read(dest)) : {}
+      new_config = safe_load(File.read(src))
+      old_config = File.exist?(dest) ? safe_load(File.read(dest)) : {}
 
       File.open(dest, 'w') do |f|
         f.write(YAML.dump(new_config.deep_merge(old_config)))
