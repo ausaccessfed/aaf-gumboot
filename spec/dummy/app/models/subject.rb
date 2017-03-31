@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class Subject < ActiveRecord::Base
   include Accession::Principal
 

@@ -170,28 +170,8 @@ Modify the generated RSpec config file as follows `.rspec`:
 Add a Rubocop config file `.rubocop.yml`:
 
 ```
-AllCops:
-  TargetRubyVersion: 2.3
-  Exclude:
-    - db/schema.rb
-
-Rails:
-  Enabled: true
-
-Rails/Output:
-  Exclude:
-    - db/seeds.rb
-
-Style/Documentation:
-  Enabled: false
-
-Metrics/MethodLength:
-  Exclude:
-    - db/migrate/*.rb
-
-Metrics/AbcSize:
-  Exclude:
-    - db/migrate/*.rb
+inherit_gem:
+  aaf-gumboot: aaf-rubocop.yml
 ```
 
 ### Simplecov
