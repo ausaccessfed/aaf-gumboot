@@ -11,6 +11,16 @@ AllCops:
 Rails:
   Enabled: true
 
+Rails/NotNullColumn:
+  Enabled: false
+
+Rails/ReversibleMigration:
+  Enabled: false
+
+Rails/SkipsModelValidations:
+  Exclude:
+    - db/migrate/*.rb
+
 Rails/Output:
   Exclude:
     - db/seeds.rb
