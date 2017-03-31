@@ -182,6 +182,16 @@ Rails/Output:
   Exclude:
     - db/seeds.rb
 
+Rails/NotNullColumn:
+  Enabled: false
+
+Rails/ReversibleMigration:
+  Enabled: false
+
+Rails/SkipsModelValidations:
+  Exclude:
+    - db/migrate/*.rb
+
 Style/Documentation:
   Enabled: false
 
@@ -192,6 +202,12 @@ Metrics/MethodLength:
 Metrics/AbcSize:
   Exclude:
     - db/migrate/*.rb
+
+Metrics/BlockLength:
+  Exclude:
+    - config/**/*.rb
+    - spec/**/*.rb
+    - db/**/*.rb
 ```
 
 ### Simplecov
