@@ -225,7 +225,7 @@ RSpec.describe Gumboot::Strap do
 
     def updated_config
       expect(written).not_to be_empty
-      YAML.safe_load(written.join)
+      YAML.safe_load(written.join, [Symbol])
     end
 
     context 'when the target does not exist' do
@@ -286,6 +286,16 @@ RSpec.describe Gumboot::Strap do
 
       it 'raises an error' do
         expect { run }.to raise_error(/Missing dist config file/)
+      end
+    end
+
+    context 'when the files contain symbol keys' do
+      let(:dist) { YAML.dump(a: 2) }
+      let(:target) { YAML.dump(a: 3) }
+
+      it 'merges the new configuration option' do
+        run
+        expect(updated_config).to eq(a: 3)
       end
     end
   end
