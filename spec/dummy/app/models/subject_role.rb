@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class SubjectRole < ActiveRecord::Base
+class SubjectRole < ApplicationRecord
   belongs_to :subject
   belongs_to :role
 
