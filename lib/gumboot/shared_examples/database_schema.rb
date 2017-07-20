@@ -35,7 +35,7 @@ RSpec.shared_examples 'Database Schema' do
         next if table_name == 'schema_migrations'
         expect(table).to have_collation('utf8_bin', "`#{table_name}`")
 
-        query("SHOW FULL COLUMNS FROM #{table[:Name]}").each do |column|
+        query("SHOW FULL COLUMNS FROM #{table_name}").each do |column|
           next unless column[:Collation]
           expect(column)
             .to have_collation('utf8_bin',
