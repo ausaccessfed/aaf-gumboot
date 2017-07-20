@@ -26,7 +26,7 @@ RSpec.shared_examples 'Database Schema' do
     end
 
     it 'has the correct collation' do
-      exemptions = collation_exemptions ? collation_exemptions : []
+      exemptions = defined?(collation_exemptions) ? collation_exemptions : []
 
       db_collation = query('SHOW VARIABLES LIKE "collation_database"')
                      .first[:Value]
