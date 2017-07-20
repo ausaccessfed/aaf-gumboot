@@ -10,7 +10,7 @@ ActiveRecord::Schema.define(version: 0) do
     t.string :value, null: false
     t.belongs_to :role, null: false
     t.timestamps null: false
-    t.index %i(role_id value), unique: true
+    t.index %i[role_id value], unique: true
   end
 
   create_table :api_subjects do |t|
