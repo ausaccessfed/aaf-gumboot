@@ -1,0 +1,50 @@
+# https://rubocop.readthedocs.io/en/latest/configuration/#inheritance
+
+# If you override a setting in a project's local .rubocop.yml file
+# you must add the pre-existing exceptions found here as well.
+
+AllCops:
+  TargetRubyVersion: 2.3
+  Exclude:
+    - db/schema.rb
+
+Rails:
+  Enabled: true
+
+Rails/NotNullColumn:
+  Enabled: false
+
+Rails/ReversibleMigration:
+  Enabled: false
+
+Rails/SkipsModelValidations:
+  Exclude:
+    - db/migrate/*.rb
+
+Rails/Output:
+  Exclude:
+    - db/seeds.rb
+
+Style/Documentation:
+  Enabled: false
+
+Metrics/MethodLength:
+  Exclude:
+    - db/migrate/*.rb
+    - config/**/*.rb
+
+Metrics/AbcSize:
+  Exclude:
+    - db/migrate/*.rb
+
+Metrics/BlockLength:
+  Exclude:
+    - "*.gemspec"
+    - spec/**/*.rb
+    - lib/tasks/*.rake
+    - config/**/*.rb
+    - db/**/*.rb
+
+Metrics/LineLength:
+  Exclude:
+    - db/migrate/*.rb

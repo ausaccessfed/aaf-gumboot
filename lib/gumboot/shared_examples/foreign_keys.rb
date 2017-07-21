@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'Gumboot Foreign Keys' do
   RSpec.shared_examples 'gumboot fk' do
     let(:conn) do

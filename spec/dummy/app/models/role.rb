@@ -1,4 +1,6 @@
-class Role < ActiveRecord::Base
+# frozen_string_literal: true
+
+class Role < ApplicationRecord
   has_many :api_subject_roles
   has_many :api_subjects, through: :api_subject_roles
 

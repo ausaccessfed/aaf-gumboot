@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'yaml'
 require 'active_support/core_ext/hash/deep_merge'
 
@@ -25,7 +27,7 @@ module Gumboot
       adapter, database = db.values_at('adapter', 'database')
       raise('Only supports mysql2 adapter') unless adapter == 'mysql2'
 
-      puts "Ensuring database `#{database}` exists"
+      Rails.logger.info "Ensuring database `#{database}` exists"
       client.query("CREATE DATABASE IF NOT EXISTS `#{database}` " \
                    'CHARACTER SET utf8 COLLATE utf8_bin')
     end
@@ -36,7 +38,10 @@ module Gumboot
 
       raise('Only supports mysql2 adapter') unless adapter == 'mysql2'
 
-      puts "Ensuring access to `#{database}` for #{username} user is granted"
+      Rails.logger.info(
+        "Ensuring access to `#{database}` for #{username} user is granted"
+      )
+
       client.query("GRANT ALL PRIVILEGES ON `#{database}`.* " \
                    "TO '#{client.escape(username)}'@'localhost' " \
                    "IDENTIFIED BY '#{client.escape(password)}'")
@@ -46,11 +51,11 @@ module Gumboot
       message 'Loading database schema'
 
       if ActiveRecord::Base.connection.execute('SHOW TABLES').count.zero?
-        puts 'No tables exist yet, loading schema'
+        Rails.logger.info 'No tables exist yet, loading schema'
         system 'rake db:schema:load'
       end
 
-      puts 'Running migrations'
+      Rails.logger.info 'Running migrations'
       system 'rake db:migrate'
     end
 
@@ -106,12 +111,16 @@ module Gumboot
     private
 
     def message(msg)
-      puts "\n== #{msg} =="
+      Rails.logger.info "\n== #{msg} =="
+    end
+
+    def safe_load(yaml)
+      YAML.safe_load(yaml, [Symbol])
     end
 
     def merge_config(src, dest)
-      new_config = YAML.load(File.read(src))
-      old_config = File.exist?(dest) ? YAML.load(File.read(dest)) : {}
+      new_config = safe_load(File.read(src))
+      old_config = File.exist?(dest) ? safe_load(File.read(dest)) : {}
 
       File.open(dest, 'w') do |f|
         f.write(YAML.dump(new_config.deep_merge(old_config)))

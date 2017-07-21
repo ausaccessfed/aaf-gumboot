@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 require 'mysql2'
@@ -127,7 +129,7 @@ RSpec.describe Gumboot::Strap do
     end
 
     context 'when a database already exists' do
-      let(:tables) { %w(schema_migrations) }
+      let(:tables) { %w[schema_migrations] }
 
       it 'runs the migrations' do
         expect(subject.kernel).to receive(:system).with('rake db:migrate')
@@ -179,19 +181,19 @@ RSpec.describe Gumboot::Strap do
       expect(FileUtils).to receive(:ln_s).with("#{base}/b", 'config/b')
       expect(FileUtils).to receive(:ln_s).with("#{base}/c", 'config/c')
 
-      subject.link_global_configuration(%w(a b c))
+      subject.link_global_configuration(%w[a b c])
     end
 
     it 'skips an existing file' do
       allow(File).to receive(:exist?).and_return(true)
       expect(FileUtils).not_to receive(:ln_s)
 
-      subject.link_global_configuration(%w(a))
+      subject.link_global_configuration(%w[a])
     end
 
     it 'raises an error for a missing file' do
       allow(File).to receive(:exist?).and_return(false)
-      expect { subject.link_global_configuration(%w(a)) }
+      expect { subject.link_global_configuration(%w[a]) }
         .to raise_error(/Missing global config file/)
     end
   end
@@ -223,7 +225,7 @@ RSpec.describe Gumboot::Strap do
 
     def updated_config
       expect(written).not_to be_empty
-      YAML.load(written.join)
+      YAML.safe_load(written.join, [Symbol])
     end
 
     context 'when the target does not exist' do
@@ -284,6 +286,16 @@ RSpec.describe Gumboot::Strap do
 
       it 'raises an error' do
         expect { run }.to raise_error(/Missing dist config file/)
+      end
+    end
+
+    context 'when the files contain symbol keys' do
+      let(:dist) { YAML.dump(a: 2) }
+      let(:target) { YAML.dump(a: 3) }
+
+      it 'merges the new configuration option' do
+        run
+        expect(updated_config).to eq(a: 3)
       end
     end
   end

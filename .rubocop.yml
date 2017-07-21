@@ -1,15 +1,13 @@
-Style/Documentation:
-  Enabled: false
+inherit_from:
+  - aaf-rubocop.yml
 
 Style/FileName:
   Exclude:
     - lib/aaf-gumboot.rb
 
-AllCops:
-  TargetRubyVersion: 2.1
-
 Metrics/BlockLength:
   Exclude:
-    - aaf-gumboot.gemspec
+    - "*.gemspec"
     - spec/**/*.rb
-    - lib/**/*.rb
+    - lib/tasks/*.rake
+    - lib/gumboot/**/*.rb

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'Permissions' do
   context 'AAF shared implementation' do
     subject { build :permission }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'Database Schema' do
   context 'AAF shared implementation' do
     RSpec::Matchers.define :have_collation do |expected, name|
@@ -24,6 +26,8 @@ RSpec.shared_examples 'Database Schema' do
     end
 
     it 'has the correct collation' do
+      exemptions = defined?(collation_exemptions) ? collation_exemptions : []
+
       db_collation = query('SHOW VARIABLES LIKE "collation_database"')
                      .first[:Value]
       expect(db_collation).to eq('utf8_bin')
@@ -33,8 +37,14 @@ RSpec.shared_examples 'Database Schema' do
         next if table_name == 'schema_migrations'
         expect(table).to have_collation('utf8_bin', "`#{table_name}`")
 
-        query("SHOW FULL COLUMNS FROM #{table[:Name]}").each do |column|
+        query("SHOW FULL COLUMNS FROM #{table_name}").each do |column|
           next unless column[:Collation]
+          next if exemptions.any? do |except_table, except_columns|
+                    except_table == table_name.to_sym &&
+                    except_columns.any? do |except_column|
+                      except_column == column[:Field].to_sym
+                    end
+                  end
           expect(column)
             .to have_collation('utf8_bin',
                                " `#{table_name}`.`#{column[:Field]}`")
