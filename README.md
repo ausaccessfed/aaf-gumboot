@@ -423,7 +423,7 @@ require 'gumboot/shared_examples/database_schema'
 RSpec.describe 'Database Schema' do
   let(:connection) { ActiveRecord::Base.connection.raw_connection }
   # Use the following (as an example) for column based exemptions
-  let(:collation_exemptions) { table_name: %i[column_name]] }
+  let(:collation_exemptions) { table_name: %i[column_name] }
 
   include_context 'Database Schema'
 end
