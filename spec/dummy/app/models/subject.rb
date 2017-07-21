@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Subject < ActiveRecord::Base
+class Subject < ApplicationRecord
   include Accession::Principal
 
   has_many :subject_roles

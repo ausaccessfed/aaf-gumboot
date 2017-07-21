@@ -129,7 +129,7 @@ RSpec.describe Gumboot::Strap do
     end
 
     context 'when a database already exists' do
-      let(:tables) { %w(schema_migrations) }
+      let(:tables) { %w[schema_migrations] }
 
       it 'runs the migrations' do
         expect(subject.kernel).to receive(:system).with('rake db:migrate')
@@ -181,19 +181,19 @@ RSpec.describe Gumboot::Strap do
       expect(FileUtils).to receive(:ln_s).with("#{base}/b", 'config/b')
       expect(FileUtils).to receive(:ln_s).with("#{base}/c", 'config/c')
 
-      subject.link_global_configuration(%w(a b c))
+      subject.link_global_configuration(%w[a b c])
     end
 
     it 'skips an existing file' do
       allow(File).to receive(:exist?).and_return(true)
       expect(FileUtils).not_to receive(:ln_s)
 
-      subject.link_global_configuration(%w(a))
+      subject.link_global_configuration(%w[a])
     end
 
     it 'raises an error for a missing file' do
       allow(File).to receive(:exist?).and_return(false)
-      expect { subject.link_global_configuration(%w(a)) }
+      expect { subject.link_global_configuration(%w[a]) }
         .to raise_error(/Missing global config file/)
     end
   end
