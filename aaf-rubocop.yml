@@ -10,6 +10,9 @@ AllCops:
 Rails:
   Enabled: true
 
+Rails/HasManyOrHasOneDependent:
+  Enabled: false
+
 Rails/NotNullColumn:
   Enabled: false
 
