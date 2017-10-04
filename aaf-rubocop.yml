@@ -4,7 +4,6 @@
 # you must add the pre-existing exceptions found here as well.
 
 AllCops:
-  TargetRubyVersion: 2.3
   Exclude:
     - db/schema.rb
 

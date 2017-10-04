@@ -3,8 +3,8 @@
 class Subject < ApplicationRecord
   include Accession::Principal
 
-  has_many :subject_roles
-  has_many :roles, through: :subject_roles
+  has_many :subject_roles, dependent: :destroy
+  has_many :roles, through: :subject_roles, dependent: :destroy
 
   valhammer
 
