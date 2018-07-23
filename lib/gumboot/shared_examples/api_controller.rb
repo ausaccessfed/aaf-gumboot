@@ -88,7 +88,7 @@ RSpec.shared_examples 'API base controller' do
 
       context 'with a CN that does not represent an APISubject' do
         before do
-          request.env['HTTP_X509_DN'] = "CN=#{Faker::Lorem.word}/" \
+          request.env['HTTP_X509_DN'] = "/CN=#{Faker::Lorem.word}/" \
                                         "O=#{Faker::Lorem.word}"
           get :an_action
         end
@@ -108,7 +108,7 @@ RSpec.shared_examples 'API base controller' do
         let(:api_subject) { create :api_subject, enabled: false }
 
         before do
-          request.env['HTTP_X509_DN'] = "CN=#{api_subject.x509_cn}/" \
+          request.env['HTTP_X509_DN'] = "/CN=#{api_subject.x509_cn}/" \
                                         "O=#{Faker::Lorem.word}"
           get :an_action
         end
@@ -130,7 +130,7 @@ RSpec.shared_examples 'API base controller' do
       let(:json) { JSON.parse(response.body) }
 
       before do
-        request.env['HTTP_X509_DN'] = "CN=#{api_subject.x509_cn}/DC=example"
+        request.env['HTTP_X509_DN'] = "/CN=#{api_subject.x509_cn}/DC=example"
       end
 
       RSpec.shared_examples 'APIController base state' do
