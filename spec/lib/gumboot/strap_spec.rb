@@ -336,7 +336,7 @@ RSpec.describe Gumboot::Strap do
     end
   end
 
-  def create_db_query(db)
-    "CREATE DATABASE IF NOT EXISTS `#{db}` CHARACTER SET utf8 COLLATE utf8_bin"
+  def create_db_query(dbs)
+    "CREATE DATABASE IF NOT EXISTS `#{dbs}` CHARACTER SET utf8 COLLATE utf8_bin"
   end
 end

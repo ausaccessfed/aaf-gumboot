@@ -23,8 +23,8 @@ module Gumboot
       end
     end
 
-    def ensure_database(db)
-      adapter, database = db.values_at('adapter', 'database')
+    def ensure_database(dbase)
+      adapter, database = dbase.values_at('adapter', 'database')
       raise('Only supports mysql2 adapter') unless adapter == 'mysql2'
 
       Rails.logger.info "Ensuring database `#{database}` exists"
@@ -32,9 +32,9 @@ module Gumboot
                    'CHARACTER SET utf8 COLLATE utf8_bin')
     end
 
-    def ensure_database_user(db)
+    def ensure_database_user(dbase)
       adapter, database, username, password =
-        db.values_at('adapter', 'database', 'username', 'password')
+        dbase.values_at('adapter', 'database', 'username', 'password')
 
       raise('Only supports mysql2 adapter') unless adapter == 'mysql2'
 
