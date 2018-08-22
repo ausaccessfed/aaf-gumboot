@@ -2,11 +2,11 @@
 
 RSpec.shared_examples 'Database Schema' do
   context 'AAF shared implementation' do
-    RSpec::Matchers.define :have_collation do |expected, name|
-      match { |actual| actual[:Collation] == expected }
+    RSpec::Matchers.define :have_collations do |expected, name|
+      match { |actual| expected.include?[actual[:Collation]] }
 
       failure_message do |actual|
-        "expected #{name} to use collation #{expected}, but was " \
+        "expected #{name} to use collation #{expected.join(' or ')}, but was " \
           "#{actual[:Collation]}"
       end
     end
@@ -35,7 +35,9 @@ RSpec.shared_examples 'Database Schema' do
       query('SHOW TABLE STATUS').each do |table|
         table_name = table[:Name]
         next if table_name == 'schema_migrations'
-        expect(table).to have_collation('utf8_bin', "`#{table_name}`")
+        expect(table).to(
+          have_collations(%w[utf8_bin utf8mb4_bin], "`#{table_name}`")
+        )
 
         query("SHOW FULL COLUMNS FROM #{table_name}").each do |column|
           next unless column[:Collation]
@@ -46,8 +48,8 @@ RSpec.shared_examples 'Database Schema' do
                     end
                   end
           expect(column)
-            .to have_collation('utf8_bin',
-                               " `#{table_name}`.`#{column[:Field]}`")
+            .to have_collations(%w[utf8_bin utf8mb4_bin],
+                                " `#{table_name}`.`#{column[:Field]}`")
         end
       end
     end
