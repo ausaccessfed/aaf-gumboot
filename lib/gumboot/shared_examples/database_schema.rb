@@ -3,7 +3,7 @@
 RSpec.shared_examples 'Database Schema' do
   context 'AAF shared implementation' do
     RSpec::Matchers.define :have_collations do |expected, name|
-      match { |actual| expected.include?[actual[:Collation]] }
+      match { |actual| expected.include?(actual[:Collation]) }
 
       failure_message do |actual|
         "expected #{name} to use collation #{expected.join(' or ')}, but was " \
