@@ -39,7 +39,7 @@ RSpec.shared_examples 'Database Schema' do
           have_collations(%w[utf8_bin utf8mb4_bin], "`#{table_name}`")
         )
 
-        query("SHOW FULL COLUMNS FROM #{table_name}").each do |column|
+        query("SHOW FULL COLUMNS FROM `#{table_name}`").each do |column|
           next unless column[:Collation]
           next if exemptions.any? do |except_table, except_columns|
                     except_table == table_name.to_sym &&
