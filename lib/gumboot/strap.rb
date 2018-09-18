@@ -42,6 +42,10 @@ module Gumboot
         "Ensuring access to `#{database}` for #{username} user is granted"
       )
 
+      create_and_grant_user(client, database, username, password)
+    end
+
+    def create_and_grant_user(client, database, username, password)
       client.query("CREATE USER IF NOT EXISTS '#{client.escape(username)}'" \
                    "@'localhost' IDENTIFIED BY '#{client.escape(password)}';")
       client.query("GRANT ALL PRIVILEGES ON `#{database}`.* " \
