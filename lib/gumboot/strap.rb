@@ -42,9 +42,10 @@ module Gumboot
         "Ensuring access to `#{database}` for #{username} user is granted"
       )
 
+      client.query("CREATE USER IF NOT EXISTS '#{client.escape(username)}'" \
+                   "@'localhost' IDENTIFIED BY '#{client.escape(password)}';")
       client.query("GRANT ALL PRIVILEGES ON `#{database}`.* " \
-                   "TO '#{client.escape(username)}'@'localhost' " \
-                   "IDENTIFIED BY '#{client.escape(password)}'")
+                   "TO '#{client.escape(username)}'@'localhost'")
     end
 
     def maintain_activerecord_schema
