@@ -87,6 +87,7 @@ module Gumboot
 
         dest =  "config/#{file}"
         next if File.exist?(dest)
+
         FileUtils.ln_s(src, dest)
       end
     end
@@ -109,6 +110,7 @@ module Gumboot
         raise("Missing dist config file: #{src}") unless File.exist?(src)
 
         next if File.exist?(dest)
+
         FileUtils.copy(src, dest)
       end
     end
