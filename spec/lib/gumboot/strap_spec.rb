@@ -73,11 +73,17 @@ RSpec.describe Gumboot::Strap do
 
     it 'sets permissions for database users' do
       expect(client).to receive(:query)
-        .with("GRANT ALL PRIVILEGES ON `one_db`.* TO 'one_user'@'localhost' " \
-              "IDENTIFIED BY 'one_password'").once
+        .with("CREATE USER IF NOT EXISTS 'one_user'@'localhost' " \
+              "IDENTIFIED BY 'one_password';").once
       expect(client).to receive(:query)
-        .with("GRANT ALL PRIVILEGES ON `two_db`.* TO 'two_user'@'localhost' " \
-              "IDENTIFIED BY 'two_password'").once
+        .with("GRANT ALL PRIVILEGES ON `one_db`.* TO 'one_user'@'localhost'")
+        .once
+      expect(client).to receive(:query)
+        .with("CREATE USER IF NOT EXISTS 'two_user'@'localhost' " \
+              "IDENTIFIED BY 'two_password';").once
+      expect(client).to receive(:query)
+        .with("GRANT ALL PRIVILEGES ON `two_db`.* TO 'two_user'@'localhost'")
+        .once
 
       allow(client).to receive(:query).with(match(/^CREATE DATABASE.*/))
 
@@ -108,8 +114,11 @@ RSpec.describe Gumboot::Strap do
 
     it 'sets permission for the database user' do
       expect(client).to receive(:query)
+        .with("CREATE USER IF NOT EXISTS 'test_user'@'localhost' " \
+          "IDENTIFIED BY 'test_password';").once
+      expect(client).to receive(:query)
         .with('GRANT ALL PRIVILEGES ON `test_db`.* TO ' \
-              "'test_user'@'localhost' IDENTIFIED BY 'test_password'").once
+              "'test_user'@'localhost'").once
 
       subject.ensure_database_user(opts)
     end

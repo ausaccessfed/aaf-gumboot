@@ -35,6 +35,7 @@ RSpec.shared_examples 'Database Schema' do
       query('SHOW TABLE STATUS').each do |table|
         table_name = table[:Name]
         next if table_name == 'schema_migrations'
+
         expect(table).to(
           have_collations(%w[utf8_bin utf8mb4_bin], "`#{table_name}`")
         )
@@ -47,6 +48,7 @@ RSpec.shared_examples 'Database Schema' do
                       except_column == column[:Field].to_sym
                     end
                   end
+
           expect(column)
             .to have_collations(%w[utf8_bin utf8mb4_bin],
                                 " `#{table_name}`.`#{column[:Field]}`")
