@@ -16,6 +16,7 @@ class ApplicationController < ActionController::Base
   def subject
     subject = session[:subject_id] && Subject.find_by(id: session[:subject_id])
     return nil unless subject.try(:functioning?)
+
     @subject = subject
   end
 
@@ -38,6 +39,7 @@ class ApplicationController < ActionController::Base
 
   def check_access!(action)
     raise(Forbidden) unless subject.permits?(action)
+
     @access_checked = true
   end
 

@@ -2,6 +2,5 @@ inherit_from:
   - ../../aaf-rubocop.yml
 
 AllCops:
-  TargetRubyVersion: 2.5
   Exclude:
     - db/schema.rb

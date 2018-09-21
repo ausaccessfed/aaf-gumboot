@@ -42,9 +42,14 @@ module Gumboot
         "Ensuring access to `#{database}` for #{username} user is granted"
       )
 
+      create_and_grant_user(client, database, username, password)
+    end
+
+    def create_and_grant_user(client, database, username, password)
+      client.query("CREATE USER IF NOT EXISTS '#{client.escape(username)}'" \
+                   "@'localhost' IDENTIFIED BY '#{client.escape(password)}';")
       client.query("GRANT ALL PRIVILEGES ON `#{database}`.* " \
-                   "TO '#{client.escape(username)}'@'localhost' " \
-                   "IDENTIFIED BY '#{client.escape(password)}'")
+                   "TO '#{client.escape(username)}'@'localhost'")
     end
 
     def maintain_activerecord_schema
@@ -82,6 +87,7 @@ module Gumboot
 
         dest =  "config/#{file}"
         next if File.exist?(dest)
+
         FileUtils.ln_s(src, dest)
       end
     end
@@ -104,6 +110,7 @@ module Gumboot
         raise("Missing dist config file: #{src}") unless File.exist?(src)
 
         next if File.exist?(dest)
+
         FileUtils.copy(src, dest)
       end
     end
