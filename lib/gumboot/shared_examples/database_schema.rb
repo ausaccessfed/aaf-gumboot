@@ -50,7 +50,7 @@ RSpec.shared_examples 'Database Schema' do
                   end
 
           expect(column)
-            .to have_collations(%w[utf8_bin utf8mb4_bin],
+            .to have_collations(%w[utf8_bin utf8mb4_bin utf8mb4_unicode_ci],
                                 " `#{table_name}`.`#{column[:Field]}`")
         end
       end
