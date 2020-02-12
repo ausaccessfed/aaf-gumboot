@@ -2,13 +2,11 @@
 
 # If you override a setting in a project's local .rubocop.yml file
 # you must add the pre-existing exceptions found here as well.
+require: rubocop-rails
 
 AllCops:
   Exclude:
     - db/schema.rb
-
-Rails:
-  Enabled: true
 
 Rails/NotNullColumn:
   Enabled: false
