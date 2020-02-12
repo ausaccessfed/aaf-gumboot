@@ -44,6 +44,6 @@ Metrics/BlockLength:
     - config/**/*.rb
     - db/**/*.rb
 
-Metrics/LineLength:
+Layout/LineLength:
   Exclude:
     - db/migrate/*.rb
