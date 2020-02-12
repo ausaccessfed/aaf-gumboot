@@ -1,3 +1,5 @@
+require: rubocop-rails
+
 inherit_from:
   - aaf-rubocop.yml
 
