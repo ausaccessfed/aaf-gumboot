@@ -15,7 +15,7 @@ end
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('dummy/config/environment.rb', __dir__)
 
-load Rails.root.join('db', 'schema.rb')
+load Rails.root.join('db/schema.rb')
 
 FactoryGirl.find_definitions
 
