@@ -45,3 +45,6 @@ Metrics/BlockLength:
 Layout/LineLength:
   Exclude:
     - db/migrate/*.rb
+
+Rails/FilePath:
+  EnforcedStyle: arguments
