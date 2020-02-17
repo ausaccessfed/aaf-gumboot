@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'mysql2'
   spec.add_development_dependency 'rails-controller-testing'
   spec.add_development_dependency 'rake'
-  spec.add_development_dependency 'rspec-rails'
+  spec.add_development_dependency 'rspec-rails', '~> 4.0.0.beta'
   spec.add_development_dependency 'rubocop'
   spec.add_development_dependency 'rubocop-rails'
   spec.add_development_dependency 'simplecov'
