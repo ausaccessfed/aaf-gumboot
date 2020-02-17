@@ -131,6 +131,7 @@ group :development, :test do
   gem 'rails-controller-testing'
   gem 'rspec-rails', '~> 3.5.0.beta4'
   gem 'rubocop', require: false
+  gem 'rubocop-rails', require: false
   gem 'shoulda-matchers'
   gem 'simplecov', require: false
   gem 'terminal-notifier-guard', require: false
