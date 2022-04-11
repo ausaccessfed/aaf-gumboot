@@ -122,7 +122,7 @@ module Gumboot
     end
 
     def safe_load(yaml)
-      YAML.safe_load(yaml, [Symbol])
+      YAML.safe_load(yaml, permitted_classes: [Symbol])
     end
 
     def merge_config(src, dest)
