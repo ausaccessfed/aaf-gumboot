@@ -15,10 +15,6 @@ RSpec.shared_examples 'Subjects' do
       subject.name = nil
       expect(subject).not_to be_valid
     end
-    it 'is invalid without mail' do
-      subject.mail = nil
-      expect(subject).not_to be_valid
-    end
     it 'is invalid without an enabled state' do
       subject.enabled = nil
       expect(subject).not_to be_valid
