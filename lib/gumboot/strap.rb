@@ -2,6 +2,7 @@
 
 require 'yaml'
 require 'active_support/core_ext/hash/deep_merge'
+require 'fileutils'
 
 module Gumboot
   module Strap
