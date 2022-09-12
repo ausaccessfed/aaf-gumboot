@@ -30,14 +30,14 @@ RSpec.shared_examples 'Database Schema' do
 
       db_collation = query('SHOW VARIABLES LIKE "collation_database"')
                      .first[:Value]
-      expect(db_collation).to eq('utf8_bin')
+      expect(%w[utf8_bin utf8mb3_bin utf8mb4_bin]).to include(db_collation)
 
       query('SHOW TABLE STATUS').each do |table|
         table_name = table[:Name]
         next if table_name == 'schema_migrations'
 
         expect(table).to(
-          have_collations(%w[utf8_bin utf8mb4_bin], "`#{table_name}`")
+          have_collations(%w[utf8_bin utf8mb3_bin utf8mb4_bin], "`#{table_name}`")
         )
 
         query("SHOW FULL COLUMNS FROM `#{table_name}`").each do |column|
@@ -50,7 +50,7 @@ RSpec.shared_examples 'Database Schema' do
                   end
 
           expect(column)
-            .to have_collations(%w[utf8_bin utf8_unicode_ci utf8mb4_bin utf8mb4_unicode_ci],
+            .to have_collations(%w[utf8_bin utf8_unicode_ci utf8mb3_bin utf8mb4_bin utf8mb4_unicode_ci],
                                 " `#{table_name}`.`#{column[:Field]}`")
         end
       end
