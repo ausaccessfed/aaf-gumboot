@@ -17,12 +17,19 @@ RSpec.shared_examples 'Database Schema' do
       connection.query(sql, as: :hash, symbolize_keys: true)
     end
 
+    encoding_options = {
+      'utf8mb4' => 'utf8mb4_bin',
+      'utf8' => 'utf8_bin'
+    }
+
     it 'has the correct encoding set for the connection' do
-      expect(connection.query_options).to include(encoding: 'utf8')
+      expect(encoding_options.keys).to include connection.query_options[:encoding]
     end
 
     it 'has the correct collation set for the connection' do
-      expect(connection.query_options).to include(collation: 'utf8_bin')
+      collation = encoding_options[connection.query_options[:encoding]]
+      expect(collation).not_to eq nil
+      expect(connection.query_options).to include(collation:)
     end
 
     it 'has the correct collation' do
