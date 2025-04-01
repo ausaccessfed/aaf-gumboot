@@ -28,7 +28,7 @@ jobs:
     steps:
       - uses: ausaccessfed/workflows/.github/actions/renovate@main
         with:
-          GITHUB_TOKEN: ${{ secrets.AAF-GUMBOOT_REPO_SCOPED_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.AAF_GUMBOOT_REPO_SCOPED_TOKEN }}
           GPG_PRIVATE_KEY: ${{ secrets.RENOVATE_GPG_PRIVATE_KEY }}
           LOG_LEVEL: ${{ github.event.inputs.LOG_LEVEL }}
           FORCE_RECREATE: ${{ github.event.inputs.FORCE_RECREATE }}
