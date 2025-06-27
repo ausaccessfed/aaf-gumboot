@@ -10,7 +10,7 @@
     "eslint-plugin-import": "2.32.0",
     "eslint-plugin-prettier": "5.5.1",
     "eslint-plugin-yml": "1.18.0",
-    "prettier": "3.6.1"
+    "prettier": "3.6.2"
   },
   "scripts": {
     "lint": "eslint . --ignore-path .eslintignore --quiet"
