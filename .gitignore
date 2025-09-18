@@ -29,3 +29,4 @@ mkmf.log
 Gemfile.lock
 
 /spec/dummy/log/*
+.yarn
