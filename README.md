@@ -103,7 +103,6 @@ The way we build ruby applications has tried to be standardised as much as possi
 gem 'mysql2'
 gem 'rails', '>= 5.0.0', '< 5.1' # Ensure latest release
 
-gem 'aaf-secure_headers'
 gem 'aaf-lipstick'
 gem 'accession'
 gem 'valhammer'
