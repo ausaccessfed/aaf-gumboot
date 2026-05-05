@@ -1,21 +1,11 @@
 # AAF Gumboot
 
-[![Gem Version][GV img]][Gem Version]
-[![Build Status][BS img]][Build Status]
-[![Dependency Status][DS img]][Dependency Status]
-[![Code Climate][CC img]][Code Climate]
-[![Coverage Status][CS img]][Code Climate]
-
-[Gem Version]: https://rubygems.org/gems/aaf-gumboot
-[Build Status]: https://codeship.com/projects/91207
-[Dependency Status]: https://gemnasium.com/ausaccessfed/aaf-gumboot
-[Code Climate]: https://codeclimate.com/github/ausaccessfed/aaf-gumboot
-
-[GV img]: https://img.shields.io/gem/v/aaf-gumboot.svg
-[BS img]: https://img.shields.io/codeship/9f557e20-0ccb-0133-b925-7aae0ba3591b/develop.svg
-[DS img]: https://img.shields.io/gemnasium/ausaccessfed/aaf-gumboot.svg
-[CC img]: https://img.shields.io/codeclimate/github/ausaccessfed/aaf-gumboot.svg
-[CS img]: https://img.shields.io/codeclimate/coverage/github/ausaccessfed/aaf-gumboot.svg
+> [!WARNING]
+> The aaf-gumboot gem is deprecated and no longer maintained.
+> 
+> We no longer follow uch of the guidance below, and intentionally so.
+>
+> In its heyday, this repo was useful, though not in every way, and it didn't achieve everything we'd hoped. If you are curious about specifics, feel free to reach out.
 
 Subjects, APISubjects, Roles, Permissions, Access Control, RESTful APIs, Events and the endless stream of possible Gems.
 
