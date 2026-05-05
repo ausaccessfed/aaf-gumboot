@@ -3,9 +3,9 @@
 > [!WARNING]
 > The aaf-gumboot gem is deprecated and no longer maintained.
 > 
-> We no longer follow uch of the guidance below, and intentionally so.
+> We now ignore much of the guidance below, and intentionally so.
 >
-> In its heyday, this repo was useful, though not in every way, and it didn't achieve everything we'd hoped. If you are curious about specifics, feel free to reach out.
+> In its heyday, this repo was useful, but not everything it attempted to do worked out well. If you are curious about specifics, feel free to reach out.
 
 Subjects, APISubjects, Roles, Permissions, Access Control, RESTful APIs, Events and the endless stream of possible Gems.
 
